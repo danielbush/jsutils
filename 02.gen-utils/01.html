@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title></title>
+
+<!-- CSS -->
+<link rel="stylesheet"
+      href="../ext/unitjs-0.5.2/lib-printers-default/printer.css"
+      media="screen,projection" type="text/css" />
+
+<!-- JavaScript : Include and embedded version -->
+<script src="../ext/jquery-1.7.1.min.js" type="text/javascript"></script>
+<script src="../ext/literate-0.1.5/main.js" type="text/javascript"></script>
+<script src="../ext/unitjs-0.5.2/main.js" type="text/javascript"></script>
+<script src="../00.literate.js" type="text/javascript"></script>
+<script src="../01.globals.js" type="text/javascript"></script>
+<script src="../02.gen-utils/01.utils.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="container">
+
+  <script type="text/javascript" >
+
+    show_scripts(function(scriptId){
+        switch(scriptId) {
+          case 'eachr':
+            return TESTS.eachr;
+            break;
+          case 'mapr':
+            return TESTS.mapr;
+            break;
+        }
+    });
+
+    // The thing we're testing:
+    var gen_utils     = $dlb_id_au$.utils.gen_utils;
+
+    var TESTS = {};
+
+  </script>
+
+  <pre>
+  <h2>map/each</h2>
+  map/each functions are self-explanatory and probably unnecessary
+  given the right version of js or the use of a library like
+  underscore.js.
+
+  <h2>Recursive iteration and mapping</h2>
+  <h3>eachr</h3>
+  each will iterate through object and arrays.
+  eachr will do likewise, but will recurse on the values found during
+  this iteration.
+  During each call, eachr will pass the current object it is looking
+  at to the function supplied to it, then recursing on that object's
+  elements, then call the same function again afterwards.
+  A flag is passed to the function to tell it which phase.
+
+  <script id="eachr" type="text/javascript" class="show" >
+    TESTS.eachr = {
+      statements:{
+        section:'eachr tests',
+        a01:{
+          test:'eachr example',
+          fn:function() {
+            // Start with an array since order is guaranteed:
+            var o = [
+              {field1a:'val1a',field1b:['val1b','val1c']},
+              ['val2a','val2b',{field2c:'val2c',field2d:[1,2,3]}]
+            ];
+            var a = [],b = [];
+            var result = gen_utils.eachr(o,null,function(thing,index,before){
+              if(before) {
+                a.push([index,thing]);
+              } else {
+                b.push([index,thing]);
+              }
+            });
+            E('Return value is not defined.',true,!result);
+            E('Outer index is not set',
+              false,!!a[0][0]);
+            E('First object passed in is the object itself',
+              'val1a',a[0][1][0]['field1a']);
+            E('Next value is next nested object',
+              'val1b',a[1][1]['field1b'][0]);
+            // TODO...
+            // TODO: hard to test object literals since
+            // order is not guaranteed.  Instead of pushing
+            // to an array, we should probably use object
+            // literal.
+          }
+        }
+      }
+    };
+  </script>
+
+  <h3>mapr</h3>
+
+  Similar to eachr but if you alter the object passed
+  to the function, it will alter a clone.  mapr will
+  always recurse on the original.  If you add fields to
+  an object or elements to an array, these will be on
+  the clone.
+
+  <script id="mapr" type="text/javascript" class="show" >
+    TESTS.mapr = {
+      statements:{
+        section:'mapr tests',
+        a01:{
+          test:'mapr example cloning (fn does nothing)',
+          fn:function() {
+            var o = {a:1,b:[1,2,3],c:[4,5,6]};
+            var result = gen_utils.mapr(o,null,function(){});
+            E('Result is a clone.',result.a,1);
+            E('Result is not the same object',false,o===result);
+          }
+        },
+        a02:{
+          test:'mapr example transformation',
+          fn:function() {
+            var o = {a:1,b:[1,2,3],c:[4,5,6]};
+            var result = gen_utils.mapr(o,null,function(thing){
+              thing.a = 24;
+            });
+            E('Clone is altered.',result.a,24);
+            E('Original is not altered.',o.a,1);
+          }
+        }
+      }
+    };
+  </script>
+
+  </pre>
+</div><!-- container -->
+
+</body>
+</html>

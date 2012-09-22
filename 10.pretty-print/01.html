@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title></title>
+
+<!-- CSS -->
+<link rel="stylesheet"
+      href="../ext/unitjs-0.5.2/lib-printers-default/printer.css"
+      media="screen,projection"
+      type="text/css" />
+
+<!-- JavaScript : Include and embedded version -->
+<script src="../ext/jquery-1.7.1.min.js" type="text/javascript"></script>
+<script src="../ext/literate-0.1.5/main.js" type="text/javascript"></script>
+<script src="../ext/unitjs-0.5.2/main.js" type="text/javascript"></script>
+<script src="../00.literate.js" type="text/javascript"></script>
+<script src="../01.globals.js" type="text/javascript"></script>
+<script src="../02.gen-utils/01.utils.js" type="text/javascript"></script>
+<script src="../10.pretty-print/01.pretty-print.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="container">
+
+  <script type="text/javascript" >
+
+    show_scripts(function(scriptId){
+        switch(scriptId) {
+          case 'pp':
+            return TESTS.pp;
+            break;
+        }
+    });
+
+    // The thing we're testing:
+    var gen_utils     = $dlb_id_au$.utils.gen_utils;
+    var pp            = $dlb_id_au$.utils.pretty_print.p;
+
+    var TESTS = {};
+
+
+  </script>
+
+  <pre>
+  <h2>Pretty printing</h2>
+
+  <script id="pp" type="text/javascript" class="show" >
+    TESTS.pp = {
+      statements:{
+        section:'pp tests',
+        a01:{
+          test:'pp example',
+          fn:function() {
+            var str;
+            str = pp({a:1});
+            E('pp of an object','{a:1}',str);
+            str = pp([1,'a']);
+            E('pp of an array','[1,"a"]',str);
+          }
+        }
+      }
+    };
+  </script>
+
+  </pre>
+</div><!-- container -->
+
+</body>
+</html>
