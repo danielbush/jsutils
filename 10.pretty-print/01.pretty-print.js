@@ -177,14 +177,27 @@ $dlb_id_au$.utils.pretty_print = function() {
 
   (function() {
 
-    var printString,toString;
+    var to_string = function(thing) {
+      if(thing.toString) {
+        return thing.toString();
+      } else {
+        return thing+'';
+      }
+    };
+
+    var print_string = function(thing) {
+      return '"'+thing+'"';
+    };
 
     // Generate a string representing a js thing.
     //
     // No attempt is made to remove or even add newlines
-    // or add or squeeze spacing. 
+    // or add or squeeze spacing.
+    //
+    // NOTE: don't camelcase! toString is an inbuilt
+    // method!!!
 
-    module.toString = function(thing) {
+    module.to_string = function(thing) {
       var s;
 
       if(thing == undefined) {
@@ -209,17 +222,17 @@ $dlb_id_au$.utils.pretty_print = function() {
           return thing.toString();
         }
         else if(thing instanceof String) {
-          return printString(thing);
+          return print_string(thing);
         }
         // Rhino
         else if(java && java.lang) {
           if(thing['class']===java.lang.Class)
-            return toString(thing);
+            return to_string(thing);
           else
-            return toString(thing['class']);
+            return to_string(thing['class']);
         }
         else {
-          toString(thing);
+          to_string(thing);
         }
         break;
 
@@ -230,25 +243,14 @@ $dlb_id_au$.utils.pretty_print = function() {
         return thing.toString();
         break;
       case 'string':
-        return printString(thing);
+        return print_string(thing);
         break;
       default:
-        return toString(thing);
+        return to_string(thing);
         break;
       };
     };
 
-    toString = function(thing) {
-      if(thing.toString) {
-        return thing.toString();
-      } else {
-        return thing+'';
-      }
-    };
-
-    printString = function(thing) {
-      return '"'+thing+'"';
-    };
 
   })();
 
@@ -401,7 +403,7 @@ $dlb_id_au$.utils.pretty_print = function() {
 
           // Print the actual thing.
         case module.EVENTS.item:
-          str+=filter(module.toString(thing));
+          str+=filter(module.to_string(thing));
           break;
 
         default:
