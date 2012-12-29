@@ -152,7 +152,7 @@ $dlb_id_au$.utils.gen_utils = function() {
       if(!nested) nested=0;
 
       // eg {prop:null}
-      if(!thing) return true;
+      if(!thing) return thing;
 
       // Pass `o` to `fn` but recurse on `thing`.
       // Also note that we pass `o` as `p` when
