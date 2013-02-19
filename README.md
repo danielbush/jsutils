@@ -16,8 +16,8 @@ This is a bunch of utilities that are not tied to the browser or the DOM which i
     
 
 
-What?
------
+Why?
+----
 
 There's probably no reason for you to be using this unless you are interested in the recursion or want a linked list or pretty printer.
 
