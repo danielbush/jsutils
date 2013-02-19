@@ -9,9 +9,11 @@ This is a bunch of utilities that are not tied to the browser or the DOM which i
 * recursive mapr
 * a pretty printer
 * a linked list (list2)
+* a stack: a weird thing that I haven't found a use for
 * TODO possibly looking at adding:
     * a tree (based on the linked list)
     * a trie
+    
 
 
 What?
