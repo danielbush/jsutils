@@ -7,6 +7,36 @@ enclosed with this project in the file LICENSE.  If not
 see <http://www.gnu.org/licenses/>.
 */
 
+/*
+  map/each
+  ========
+  map/each functions are self-explanatory and probably unnecessary
+  given the right version of js or the use of a library like
+  underscore.js.
+
+  Recursive iteration and mapping
+  ===============================
+
+  eachr
+  -----
+  each will iterate through object and arrays.
+  eachr will do likewise, but will recurse on the values found during
+  this iteration.
+  During each call, eachr will pass the current object it is looking
+  at to the function supplied to it, then recursing on that object's
+  elements, then call the same function again afterwards.
+  A flag is passed to the function to tell it which phase.
+
+  mapr
+  ----
+  Similar to eachr but if you alter the object passed
+  to the function, it will alter a clone.  mapr will
+  always recurse on the original.  If you add fields to
+  an object or elements to an array, these will be on
+  the clone.
+
+*/
+
 
 $dlb_id_au$.utils.gen_utils = function() {
 
