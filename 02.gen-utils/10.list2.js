@@ -11,7 +11,7 @@ see <http://www.gnu.org/licenses/>.
 //
 // Supports push/pop operations.
 
-$dlb_id_au$.domutils.list2 = function(){
+$dlb_id_au$.utils.list2 = function(){
 
   var module = {};
 

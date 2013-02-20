@@ -19,7 +19,7 @@ see <http://www.gnu.org/licenses/>.
 // using closures or classes.
 
 
-$dlb_id_au$.domutils.stack = function(){
+$dlb_id_au$.utils.stack = function(){
 
   var module = {};
 
