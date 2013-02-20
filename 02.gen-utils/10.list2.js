@@ -64,7 +64,6 @@ $dlb_id_au$.utils.list2 = function(){
     }
     m = module.get(i);
     if(!m) throw new Error("insert: corrupt list");
-    this.root.insertBefore(m);
 
     // <-- [m.previous] --1-- *[n] --2-- [m] -->
 
