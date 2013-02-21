@@ -11,7 +11,9 @@ see <http://www.gnu.org/licenses/>.
 
 var utils = {
   gen_utils:$dlb_id_au$.utils.gen_utils,
-  pretty_print:$dlb_id_au$.utils.pretty_print
+  pretty_print:$dlb_id_au$.utils.pretty_print,
+  list3:$dlb_id_au$.utils.list3,
+  tree:$dlb_id_au$.utils.tree
 };
 
 var data = $dlb_id_au$.unitJS.data;
