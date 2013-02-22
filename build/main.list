@@ -1,7 +1,6 @@
 01.globals.js
 02.gen-utils/01.utils.js
 02.gen-utils/09.list-ops.js
-02.gen-utils/10.list2.js
 02.gen-utils/10.list3.js
 02.gen-utils/11.tree.js
 02.gen-utils/12.stack.js
