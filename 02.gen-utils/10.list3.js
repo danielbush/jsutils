@@ -30,7 +30,7 @@ $dlb_id_au$.utils.list3 = function(){
     var entry;
     entry = list.makeEntry();
     if(this.callbacks.makeEntry) {
-      entry = this.callbacks.makeEntry(entry);
+      entry = this.callbacks.makeEntry.run(entry);
     }
     return entry;
   };

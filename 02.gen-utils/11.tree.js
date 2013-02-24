@@ -40,13 +40,15 @@ $dlb_id_au$.utils.tree = function(){
     }
 
     node.children = new List({
-      node:node, // Avoid closure.
-      makeEntry:function(entry){
-        var n;
-        n = module.makeNode(entry);
-        // Use this.node to avoid closure, hopefully :)
-        n.parentNode = this.node;
-        return n;
+      makeEntry:{
+        node:node, // Avoid closure.
+        run:function(entry){
+          var n;
+          n = module.makeNode(entry);
+          // Use this.node to avoid closure, hopefully :)
+          n.parentNode = this.node;
+          return n;
+        }
       }
     });
 
