@@ -5,8 +5,8 @@ $dlb_id_au$.utils.data = function() {
 
   // Entry data structure.
   //
-  // Intended for use with linked lists and trees in defined in
-  // subsequent modules.
+  // Intended for use with linked lists and trees.
+  // (See subsequent modules.)
 
   module.makeEntry = function() {
 
