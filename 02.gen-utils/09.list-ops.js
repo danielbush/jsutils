@@ -18,10 +18,25 @@ $dlb_id_au$.utils.listops = function() {
 
   module.makeEntry = function() {
     return {
+
       next:null,
       previous:null,
+
+      // Another entry that contains this entry.
+      // 
+      // parentEntry.list will contain this entry.
+
+      parentEntry:null,
+
+      // A list of entries associated with this entry.
+      // 
+      // This entry would be the parentEntry of these entries.
+
+      list:null,
+
       // Place to hang functions or data associated with this list
       // item.
+
       data:{}
     };
   };

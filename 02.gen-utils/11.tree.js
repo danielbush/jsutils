@@ -14,61 +14,58 @@ $dlb_id_au$.utils.tree = function(){
   var List   = $dlb_id_au$.utils.list3.List;
   var list   = $dlb_id_au$.utils.listops;
 
-  // Make a node / make a tree.
+  // Make an entry / make a tree.
   //
-  // This could be the root node in the tree.
-  // Nodes are just extended list entry objects.
-  // If 'entry' is passed, it will be converted to a node.
+  // This could be the root entry in the tree.
+  // Entries are just extended list entry objects.
+  // If 'entry' is passed, it will be converted to a entry.
   // 
   // The chief innovations we apply to list entries are:
-  // 1) node.parentNode
-  //    Note the nested call to makeNode in the makeEntry callback
-  //    and how we set parentNode to the parent node.
-  // 2) node.children
-  //    A list of children.
+  // 1) entry.parentEntry
+  //    Note the nested call to makeEntry in the makeEntry callback
+  //    and how we set parentEntry to the parent node.
+  // 2) entry.list
+  //    A list of entries.
   //
   // Operations like append and insertBefore are performed on
-  // 'children'.
+  // 'list'.
 
-  module.makeNode = function(entry) {
-    var node;
+  module.makeEntry = function(entry) {
 
-    if(entry) {
-      node = entry;
-    } else {
-      node = list.makeEntry();
+    if(!entry) {
+      entry = list.makeEntry();
     }
 
-    node.children = new List({
+    entry.parentEntry = null;
+    entry.list = new List({
       makeEntry:{
-        node:node, // Avoid closure.
+        entry:entry, // Avoid closure.
         run:function(entry){
-          var n;
-          n = module.makeNode(entry);
-          // Use this.node to avoid closure, hopefully :)
-          n.parentNode = this.node;
-          return n;
+          var e;
+          e = module.makeEntry(entry);
+          // Use this.entry to avoid closure, hopefully :)
+          e.parentEntry = this.entry;
+          return e;
         }
       }
     });
 
-    node.parentNode = null;
-    return node;
+    return entry;
   };
 
-  // Walk a tree of nodes depth-first.
+  // Walk a tree of entries depth-first.
 
-  module.walk = function(node,visit,postVisit,fn) {
+  module.walk = function(entry,visit,postVisit,fn) {
     if(visit) {
-      visit(node);
+      visit(entry);
     }
-    if(node.children && node.children.head) {
-      list.walk(node.children.head,function(node){
-        module.walk(node,visit,postVisit,fn);
+    if(entry.list && entry.list.head) {
+      list.walk(entry.list.head,function(entry){
+        module.walk(entry,visit,postVisit,fn);
       });
     }
     if(postVisit) {
-      postVisit(node);
+      postVisit(entry);
     }
   };
 

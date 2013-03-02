@@ -67,32 +67,32 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
   });
 
-  M.tests('tree',function(M){
+  M.tests('tree tests',function(M){
 
-    var tree0 = function(){return tree.makeNode();};
-    var tree1 = function(){var t = tree0(); t.children.append(); return t;};
-    var tree2 = function(){var t = tree1(); t.children.append(); return t;};
+    var tree0 = function(){return tree.makeEntry();};
+    var tree1 = function(){var t = tree0(); t.list.append(); return t;};
+    var tree2 = function(){var t = tree1(); t.list.append(); return t;};
 
     M.test('making and appending/inserting...',function(){
       var n,n2;
-      n = tree.makeNode();
-      n2 = n.children.append();
+      n = tree.makeEntry();
+      n2 = n.list.append();
       this.assert(
-        "Appended node children have parentNode set to node.",
-        n2.parentNode==n
+        "Appended entries have parentEntry set to entry.",
+        n2.parentEntry==n
       );
       this.assert(
-        "We can access the list of a node by getting its parentNode.",
-        n2.parentNode.children==n.children
+        "We can access the list of an entry by getting its parentEntry.",
+        n2.parentEntry.list==n.list
       );
       this.assert(
-        "Children operations create new nodes with children property.",
-        !!n2.children
+        "List operations create new entries with 'list' property.",
+        !!n2.list
       );
 
-      n2 = n.children.append();
+      n2 = n.list.append();
       n2.data.a = true;
-      n2 = n.children.insertAfter(n2);
+      n2 = n.list.insertAfter(n2);
       n2.data.b = true;
       this.assert(
         "We can insert after.",
@@ -103,16 +103,16 @@ tests.items.push(with_tests$('lists and trees',function(M){
       // Append one independent tree into another.
       n = tree2(); n.data.n = true;
       n2 = tree2(); n2.data.n2 = true;
-      n2.children.head.data.n2first = true;
-      n.children.append(n2);
+      n2.list.head.data.n2first = true;
+      n.list.append(n2);
       console.log(n);
       this.assert(
         "Append one tree as child of another.",
-        n.children.tail == n2
+        n.list.tail == n2
       );
       this.assert(
-        "Access the children of a child node.",
-        n.children.tail.children.head.data.n2first
+        "Access the list of a child entry.",
+        n.list.tail.list.head.data.n2first
       );
       
     });
@@ -123,19 +123,19 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
       n = tree2();
       n.data.id='n';
-      n.children.head.data.id='nh';
-      n.children.tail.data.id='nt';
+      n.list.head.data.id='nh';
+      n.list.tail.data.id='nt';
       n2 = tree2();
       n2.data.id='n2';
-      n2.children.head.data.id='n2h';
-      n2.children.tail.data.id='n2t';
+      n2.list.head.data.id='n2h';
+      n2.list.tail.data.id='n2t';
 
-      n.children.append(n2);
+      n.list.append(n2);
       
       tree.walk(
         n,
-        function(node){visit+=node.data.id+'-';},
-        function(node){postVisit+=node.data.id+'-';}
+        function(entry){visit+=entry.data.id+'-';},
+        function(entry){postVisit+=entry.data.id+'-';}
       );
 
       this.assertEquals(

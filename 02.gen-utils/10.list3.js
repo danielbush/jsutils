@@ -26,6 +26,11 @@ $dlb_id_au$.utils.list3 = function(){
     this.callbacks = cb || {};
   };
 
+  // Make a list entry.
+  // 
+  // makeEntry will look for a this.callbacks.makeEntry object and
+  // call it to modify the entry before returning.
+
   module.List.prototype.makeEntry = function() {
     var entry;
     entry = list.makeEntry();
