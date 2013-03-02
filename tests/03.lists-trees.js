@@ -67,13 +67,13 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
   });
 
-  M.tests('tree tests',function(M){
+  M.tests('Tree tests',function(M){
 
     var tree0 = function(){return tree.makeEntry();};
     var tree1 = function(){var t = tree0(); t.list.append(); return t;};
     var tree2 = function(){var t = tree1(); t.list.append(); return t;};
 
-    M.test('making and appending/inserting...',function(){
+    M.test('Making entries and appending/inserting...',function(){
       var n,n2;
       n = tree.makeEntry();
       n2 = n.list.append();
@@ -85,6 +85,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
         "We can access the list of an entry by getting its parentEntry.",
         n2.parentEntry.list==n.list
       );
+      console.log(n2);
       this.assert(
         "List operations create new entries with 'list' property.",
         !!n2.list

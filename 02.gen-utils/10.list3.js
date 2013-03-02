@@ -16,6 +16,7 @@ see <http://www.gnu.org/licenses/>.
 $dlb_id_au$.utils.list3 = function(){
 
   var module = {};
+  var data   = $dlb_id_au$.utils.data;
   var list   = $dlb_id_au$.utils.listops;
 
   module.List = function(cb) {
@@ -33,7 +34,7 @@ $dlb_id_au$.utils.list3 = function(){
 
   module.List.prototype.makeEntry = function() {
     var entry;
-    entry = list.makeEntry();
+    entry = data.makeEntry();
     if(this.callbacks.makeEntry) {
       entry = this.callbacks.makeEntry.run(entry);
     }

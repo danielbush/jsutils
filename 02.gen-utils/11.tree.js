@@ -11,8 +11,9 @@ $dlb_id_au$.utils.tree = function(){
 
   var module = {};
 
-  var List   = $dlb_id_au$.utils.list3.List;
+  var data   = $dlb_id_au$.utils.data;
   var list   = $dlb_id_au$.utils.listops;
+  var List   = $dlb_id_au$.utils.list3.List;
 
   // Make an entry / make a tree.
   //
@@ -33,7 +34,7 @@ $dlb_id_au$.utils.tree = function(){
   module.makeEntry = function(entry) {
 
     if(!entry) {
-      entry = list.makeEntry();
+      entry = data.makeEntry();
     }
 
     entry.parentEntry = null;

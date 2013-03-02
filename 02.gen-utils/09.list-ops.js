@@ -15,31 +15,7 @@ see <http://www.gnu.org/licenses/>.
 $dlb_id_au$.utils.listops = function() {
 
   var module = {};
-
-  module.makeEntry = function() {
-    return {
-
-      next:null,
-      previous:null,
-
-      // Another entry that contains this entry.
-      // 
-      // parentEntry.list will contain this entry.
-
-      parentEntry:null,
-
-      // A list of entries associated with this entry.
-      // 
-      // This entry would be the parentEntry of these entries.
-
-      list:null,
-
-      // Place to hang functions or data associated with this list
-      // item.
-
-      data:{}
-    };
-  };
+  var data = $dlb_id_au$.utils.data;
 
 
   // Insert new entry before existing one.
@@ -50,7 +26,7 @@ $dlb_id_au$.utils.listops = function() {
   module.insertBefore = function(e1,e2) {
     var t,n;
     if(!e2) {
-      e2 = e1; e1 = module.makeEntry();
+      e2 = e1; e1 = data.makeEntry();
     }
     n = e2.previous;
 
@@ -71,7 +47,7 @@ $dlb_id_au$.utils.listops = function() {
   module.insertAfter = function(e1,e2) {
     var t,n;
     if(!e2) {
-      e2 = e1; e1 = module.makeEntry();
+      e2 = e1; e1 = data.makeEntry();
     }
 
     n = e2.next;

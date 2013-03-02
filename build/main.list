@@ -1,5 +1,6 @@
 01.globals.js
 02.gen-utils/01.utils.js
+02.gen-utils/02.data.js
 02.gen-utils/09.list-ops.js
 02.gen-utils/10.list3.js
 02.gen-utils/11.tree.js
