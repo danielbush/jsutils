@@ -11,6 +11,13 @@ see <http://www.gnu.org/licenses/>.
 // 
 // 'List' represents a list and has to do some bookkeeping to
 // maintain head and tail references.
+//
+// Lists are the basic building block for the tree structure
+// introduced in a subsequent module.
+// 
+// In order to use list operations like append etc in a tree context,
+// we add a this.callbacks.makeEntry callback that allows entries to
+// be appropriately extended when calls to append etc are made.
 
 
 $dlb_id_au$.utils.list3 = function(){
