@@ -2,6 +2,8 @@
 
 tests.items.push(with_tests$('01.utils',function(M){
 
+    var utils = $dlb_id_au$.utils;
+
     M.test('eachr example',function(){
 
       // Start with an array since order is guaranteed:

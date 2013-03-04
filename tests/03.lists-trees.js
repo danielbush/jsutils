@@ -2,8 +2,11 @@
 
 tests.items.push(with_tests$('lists and trees',function(M){
 
-  var List = utils.list3.List;
-  var tree = utils.tree;
+  var gen_utils = $dlb_id_au$.utils.gen_utils;
+  var data2 = $dlb_id_au$.utils.data2;
+  var entryops = $dlb_id_au$.utils.entryops;
+  var List = $dlb_id_au$.utils.list3.List;
+  var tree = $dlb_id_au$.utils.tree;
 
   M.tests('list3',function(M){
 
@@ -148,6 +151,153 @@ tests.items.push(with_tests$('lists and trees',function(M){
         postVisit,'nh-nt-n2h-n2t-n2-n-'
       );
 
+    });
+
+  });
+
+  M.tests('data2 list/tree ops',function(M){
+
+    M.test('Make entry...',function(){
+      var e = data2.makeEntry();
+      this.assert(e.next$===null); // etc
+    });
+
+    M.tests('Building a list...',function(M){
+
+      M.test('2 arg ops',function(){
+        var e1,e2;
+        e1 = data2.makeEntry();
+        e2 = data2.makeEntry();
+
+        entryops.insertAfter(e1,e2);
+        this.assert(e2.next$==e1);
+        this.assert(e1.previous$==e2);
+
+        entryops.insertBefore(e1,e2);
+        this.assert(e1.next$==e2);
+        this.assert(e2.previous$==e1);
+        
+      });
+
+      M.test('1 arg ops',function(){
+        var e1,e2;
+        e1 = data2.makeEntry();
+
+        e2 = entryops.insertBefore(e1);
+        this.assert(e2.next$==e1);
+        this.assert(e1.previous$==e2);
+
+        e1 = data2.makeEntry();
+        e2 = entryops.insertAfter(e1);
+        this.assert(e1.next$==e2);
+        this.assert(e2.previous$==e1);
+
+      });
+      
+    });
+
+    M.tests('Building a tree...',function(M){
+      M.test('2 arg...',function(){
+        var e,e1,e2,e3;
+
+        e1 = data2.makeEntry();
+        e2 = data2.makeEntry();
+        entryops.appendChild(e2,e1);
+        this.assert(e1.children$.head==e2);
+        this.assert(e2.parentEntry$==e1);
+
+        e3 = data2.makeEntry();
+        entryops.appendChild(e3,e1);
+        this.assert(e1.children$.head==e2);
+        this.assert(e1.children$.head.next$==e3);
+        this.assert(e3.parentEntry$==e1);
+
+        e = entryops.insertAfter(e3);
+        this.assert(e3.next$==e);
+        this.assertEquals(
+          "insertAfter: New entry's parent is same as e3's.",
+          e3.parentEntry$,
+          e.parentEntry$
+        );
+        this.assertEquals(
+          "insertAfter: New entry's parent is same as e3's.",
+          e1,e.parentEntry$
+        );
+
+        e = entryops.insertBefore(e3);
+        this.assertEquals(
+          "insertBefore: New entry's parent is same as e3's.",
+          e3.parentEntry$,
+          e.parentEntry$
+        );
+        this.assertEquals(
+          "insertBefore: New entry's parent is same as e3's.",
+          e1,
+          e.parentEntry$
+        );
+
+      });
+
+      M.test('1 arg...',function(){
+        e1 = data2.makeEntry();
+        e2 = entryops.appendChild(e1);
+        this.assert(e1.children$.head==e2);
+        this.assert(e2.parentEntry$==e1);
+      });
+
+    });
+    
+    // Make an entry and add 'd' as tag in data$.
+
+    var makeTestEntry = function(d){
+      var e = data2.makeEntry();
+      e.data$.tag = d;
+      return e;
+    };
+
+    // Make a list of entries.
+
+    var makeTestList = function(n) {
+      var head,e1,e2;
+      if(!n) n = 3;
+      for(var i=1;i<=n;i++) {
+        e2 = makeTestEntry(i);
+        if(!head) head = e2;
+        if(e1) {
+          entryops.insertAfter(e2,e1);
+        }
+        e1 = e2;
+      }
+      return head;
+    };
+
+    // Return root node of tree.
+
+    var makeTestTree = function() {
+      var m = makeTestEntry;
+      var root = m();
+      m.children$.head = makeTestList(2);
+      entryops.sibwalk(m.children$.head,function(e){
+        e.children$.head = makeTestList(2)
+        //entryops.sibwalk()
+      });
+      return root;
+    };
+
+    M.test('Walking, finding, counting...',function(){
+      var str = '';
+      var head = makeTestList(4);
+      entryops.sibwalk(head,function(entry){
+        str += entry.data$.tag + ' ';
+      });
+      this.assertEquals('1 2 3 4 ',str);
+      this.assertEquals(4,entryops.count(head));
+      this.assertEquals(head,entryops.head(head.next$));
+      this.assertEquals(
+        head.next$.next$.next$,
+        entryops.tail(head)
+      );
+      
     });
 
   });
