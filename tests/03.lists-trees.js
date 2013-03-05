@@ -272,31 +272,110 @@ tests.items.push(with_tests$('lists and trees',function(M){
     };
 
     // Return root node of tree.
+    //
+    // Example: n=2, levels = 0 to 2, depth = 2
+    //      0
+    //   1      2
+    // 3   4  5   6
+    // 
 
-    var makeTestTree = function() {
-      var m = makeTestEntry;
-      var root = m();
-      m.children$.head = makeTestList(2);
-      entryops.sibwalk(m.children$.head,function(e){
-        e.children$.head = makeTestList(2)
-        //entryops.sibwalk()
-      });
+    var makeTestTree = function(n,depth) {
+      if(!n) n = 2;
+      if(!depth) depth = 2;
+      var t = function(){return makeTestEntry(seq++);};
+      var seq = 0;
+      var root;
+
+      var addChildren = function(e,level) {
+        var i,head,h;
+        if(!level) level = 0;
+        for(i=1;i<=n;i++) {
+          h = entryops.appendChild(t(),e);
+          if(level+1>=depth) {
+          } else {
+            addChildren(h,level+1);
+          }
+          if(!head) head = h;
+        }
+        return head;
+      };
+
+      root = t();
+      addChildren(root);
       return root;
     };
 
-    M.test('Walking, finding, counting...',function(){
-      var str = '';
-      var head = makeTestList(4);
-      entryops.sibwalk(head,function(entry){
-        str += entry.data$.tag + ' ';
+    M.tests('Walking, finding, counting...',function(M){
+
+      M.test('sibwalking',function() {
+        var str = '';
+        var head = makeTestList(4);
+        entryops.sibwalk(head,function(entry){
+          str += entry.data$.tag + ' ';
+        });
+        this.assertEquals('1 2 3 4 ',str);
+        this.assertEquals(4,entryops.count(head));
+        this.assertEquals(head,entryops.head(head.next$));
+        this.assertEquals(
+          head.next$.next$.next$,
+          entryops.tail(head)
+        );
       });
-      this.assertEquals('1 2 3 4 ',str);
-      this.assertEquals(4,entryops.count(head));
-      this.assertEquals(head,entryops.head(head.next$));
-      this.assertEquals(
-        head.next$.next$.next$,
-        entryops.tail(head)
-      );
+
+      M.tests('tree walking',function(M) {
+        M.test('basic walk/walkback',function(){
+          var tree = makeTestTree(2,2);
+          var str = '';
+          entryops.walk(tree,function(e){
+            str+=e.data$.tag+' ';
+          });
+          this.assertEquals('0 1 2 3 4 5 6 ',str);
+
+          str = '';
+          entryops.walkback(tree,function(e){
+            str+=e.data$.tag+' ';
+          });
+          this.assertEquals('0 4 6 5 1 3 2 ',str);
+        });
+
+        M.test('walkAfter/walkBefore',function(){
+          var tree = makeTestTree(2,2);
+          var e,str;
+
+          e = tree.children$.head.children$.head.next$;
+          this.assertEquals(3,e.data$.tag);
+
+          str = '';
+          entryops.walkAfter(e,function(e){
+            str += e.data$.tag + ' ';
+          });
+          this.assertEquals('4 5 6 ',str);
+
+          str = '';
+          entryops.walkBefore(e,function(e){
+            str += e.data$.tag + ' ';
+          });
+          this.assertEquals('2 ',str);
+        });
+
+        M.test('breaking behaviour',function(){
+          // Test that returning true will halt the walk.
+          var tree = makeTestTree(2,2);
+          var e,str;
+
+          e = tree.children$.head.next$.children$.head;
+          this.assertEquals(5,e.data$.tag);
+
+          str = '';
+          entryops.walkBefore(e,function(e){
+            if(e.data$.tag==3) return true;
+            str += e.data$.tag + ' ';
+          });
+          this.assertEquals('1 ',str);
+
+        });
+
+      });
       
     });
 

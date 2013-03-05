@@ -57,6 +57,8 @@ $dlb_id_au$.utils.entryops = function() {
   };
 
 
+
+
   // Insert new entry before existing one.
   //
   // insertBefore(e1) => insert new entry before e1
@@ -155,9 +157,10 @@ $dlb_id_au$.utils.entryops = function() {
 
   module.sibwalk = function(start,fn) {
     var n,i;
+    var r;
     for(i=0,n=start;n;i++,n=n.next$) {
-      if(fn(n,i)) {
-        break;
+      if(r=fn(n,i)) {
+        return r;
       }
     }
   };
@@ -168,26 +171,97 @@ $dlb_id_au$.utils.entryops = function() {
 
   module.sibwalkback = function(start,fn) {
     var n,i;
+    var r;
     for(i=0,n=start;n;i++,n=n.previous$) {
-      if(fn(n,i)) {
-        break;
+      if(r=fn(n,i)) {
+        return r;
       }
     }
   };
 
-  // Walk a tree of entries depth-first.
+  // Walk a tree of entries with entry as root depth-first.
 
-  module.walk = function(entry,visit,postVisit,fn) {
+  module.walk = function(entry,visit,postVisit) {
+    var r,e;
     if(visit) {
-      visit(entry);
+      r = visit(entry);
+      if(r) return r;
     }
-    if(entry.children$.head) {
-      module.sibwalk(entry.children$.head,function(entry){
-        module.walk(entry,visit,postVisit,fn);
-      });
+    if(e=entry.children$.head) {
+      for(;e;e=e.next$) {
+        r = module.walk(e,visit,postVisit);
+        if(r) return r;
+      }
     }
     if(postVisit) {
-      postVisit(entry);
+      r = postVisit(entry);
+      if(r) return r;
+    }
+  };
+
+  // Walk past entry, don't pre/post visit entry.
+  //
+  // It's as if we just postVisited entry.
+
+  module.walkAfter = function(entry,visit,postVisit) {
+    var r;
+    var e = entry;
+    while(e=e.next$) {
+      r = module.walk(e,visit,postVisit);
+      if(r) return r;
+    }
+    if(e=entry.parentEntry$) {
+      if(postVisit) {
+        r = postVisit(e);
+        if(r) return r;
+      }
+      r = module.walkAfter(e,visit,postVisit);
+      if(r) return r;
+    }
+  };
+
+  // Walk a tree of entries with entry as root in the opposite
+  // direction.
+
+  module.walkback = function(entry,visit,postVisit) {
+    var e,r;
+    if(visit) {
+      r = visit(entry);
+      if(r) return r;
+    }
+    if(e=entry.children$.head) {
+      e = module.tail(e);
+      console.log(e);
+      for(;e;e=e.previous$) {
+        r = module.walkback(e,visit,postVisit);
+        if(r) return r;  // break in sibwalkback
+      }
+    }
+    if(postVisit) {
+      r = postVisit(entry);
+      if(r) return r;
+    }
+  };
+
+
+  // Walk back from entry, don't pre/post visit entry.
+  //
+  // Same direction as walkback.
+
+  module.walkBefore = function(entry,visit,postVisit) {
+    var r;
+    var e = entry;
+    while(e=e.previous$) {
+      r = module.walkback(e,visit,postVisit);
+      if(r) return r;
+    }
+    if(e=entry.parentEntry$) {
+      if(postVisit) {
+        r = postVisit(e);
+        if(r) return r;
+      }
+      r = module.walkBefore(e,visit,postVisit);
+      if(r) return r;
     }
   };
 
