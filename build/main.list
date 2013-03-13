@@ -1,10 +1,6 @@
 01.globals.js
 02.gen-utils/01.utils.js
 02.gen-utils/02.data2.js
-02.gen-utils/02.data.js
 02.gen-utils/05.entry-ops.js
-02.gen-utils/09.list-ops.js
-02.gen-utils/10.list3.js
-02.gen-utils/11.tree.js
 02.gen-utils/12.stack.js
 10.pretty-print/01.pretty-print.js
