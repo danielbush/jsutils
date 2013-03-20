@@ -226,6 +226,19 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
         });
 
+        M.test('parent walking',function() {
+          var tree = makeTestTree(2,2);
+          var entry = tree.children$.head.children$.head;
+          var result = [];
+          this.assertEquals(2,entry.data$.tag);
+          entryops.walkParents(entry,function(p){
+            result.push(p);
+          });
+          this.assertEquals(1,result[0].data$.tag);
+          this.assertEquals(0,result[1].data$.tag);
+        });
+
+
       });
       
     });

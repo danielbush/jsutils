@@ -265,6 +265,19 @@ $dlb_id_au$.utils.entryops = function() {
     }
   };
 
+  // Walk the parent entries of 'entry'.
+  //
+  // Stop if fn returns truthy.
+
+  module.walkParents = function(entry,fn) {
+    var p,r;
+    p = entry;
+    while(p=p.parentEntry$) {
+      r = fn(p);
+      if(r) return r;
+    }
+  };
+
   return module;
 
 }();
