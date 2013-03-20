@@ -4,7 +4,8 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
   var gen_utils = $dlb_id_au$.utils.gen_utils;
   var data2 = $dlb_id_au$.utils.data2;
-  var entryops = $dlb_id_au$.utils.entryops;
+  var findops = $dlb_id_au$.utils.findops;
+  var editops = $dlb_id_au$.utils.editops;
 
   M.tests('data2 list/tree ops',function(M){
 
@@ -20,11 +21,11 @@ tests.items.push(with_tests$('lists and trees',function(M){
         e1 = data2.makeEntry();
         e2 = data2.makeEntry();
 
-        entryops.insertAfter(e1,e2);
+        editops.insertAfter(e1,e2);
         this.assert(e2.next$==e1);
         this.assert(e1.previous$==e2);
 
-        entryops.insertBefore(e1,e2);
+        editops.insertBefore(e1,e2);
         this.assert(e1.next$==e2);
         this.assert(e2.previous$==e1);
         
@@ -34,12 +35,12 @@ tests.items.push(with_tests$('lists and trees',function(M){
         var e1,e2;
         e1 = data2.makeEntry();
 
-        e2 = entryops.insertBefore(e1);
+        e2 = editops.insertBefore(e1);
         this.assert(e2.next$==e1);
         this.assert(e1.previous$==e2);
 
         e1 = data2.makeEntry();
-        e2 = entryops.insertAfter(e1);
+        e2 = editops.insertAfter(e1);
         this.assert(e1.next$==e2);
         this.assert(e2.previous$==e1);
 
@@ -53,17 +54,17 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
         e1 = data2.makeEntry();
         e2 = data2.makeEntry();
-        entryops.appendChild(e2,e1);
+        editops.appendChild(e2,e1);
         this.assert(e1.children$.head==e2);
         this.assert(e2.parentEntry$==e1);
 
         e3 = data2.makeEntry();
-        entryops.appendChild(e3,e1);
+        editops.appendChild(e3,e1);
         this.assert(e1.children$.head==e2);
         this.assert(e1.children$.head.next$==e3);
         this.assert(e3.parentEntry$==e1);
 
-        e = entryops.insertAfter(e3);
+        e = editops.insertAfter(e3);
         this.assert(e3.next$==e);
         this.assertEquals(
           "insertAfter: New entry's parent is same as e3's.",
@@ -75,7 +76,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
           e1,e.parentEntry$
         );
 
-        e = entryops.insertBefore(e3);
+        e = editops.insertBefore(e3);
         this.assertEquals(
           "insertBefore: New entry's parent is same as e3's.",
           e3.parentEntry$,
@@ -91,7 +92,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
       M.test('1 arg...',function(){
         e1 = data2.makeEntry();
-        e2 = entryops.appendChild(e1);
+        e2 = editops.appendChild(e1);
         this.assert(e1.children$.head==e2);
         this.assert(e2.parentEntry$==e1);
       });
@@ -115,7 +116,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
         e2 = makeTestEntry(i);
         if(!head) head = e2;
         if(e1) {
-          entryops.insertAfter(e2,e1);
+          editops.insertAfter(e2,e1);
         }
         e1 = e2;
       }
@@ -141,7 +142,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
         var i,head,h;
         if(!level) level = 0;
         for(i=1;i<=n;i++) {
-          h = entryops.appendChild(t(),e);
+          h = editops.appendChild(t(),e);
           if(level+1>=depth) {
           } else {
             addChildren(h,level+1);
@@ -161,15 +162,15 @@ tests.items.push(with_tests$('lists and trees',function(M){
       M.test('sibwalking',function() {
         var str = '';
         var head = makeTestList(4);
-        entryops.sibwalk(head,function(entry){
+        findops.sibwalk(head,function(entry){
           str += entry.data$.tag + ' ';
         });
         this.assertEquals('1 2 3 4 ',str);
-        this.assertEquals(4,entryops.count(head));
-        this.assertEquals(head,entryops.head(head.next$));
+        this.assertEquals(4,findops.count(head));
+        this.assertEquals(head,findops.head(head.next$));
         this.assertEquals(
           head.next$.next$.next$,
-          entryops.tail(head)
+          findops.tail(head)
         );
       });
 
@@ -177,13 +178,13 @@ tests.items.push(with_tests$('lists and trees',function(M){
         M.test('basic walk/walkback',function(){
           var tree = makeTestTree(2,2);
           var str = '';
-          entryops.walk(tree,function(e){
+          findops.walk(tree,function(e){
             str+=e.data$.tag+' ';
           });
           this.assertEquals('0 1 2 3 4 5 6 ',str);
 
           str = '';
-          entryops.walkback(tree,function(e){
+          findops.walkback(tree,function(e){
             str+=e.data$.tag+' ';
           });
           this.assertEquals('0 4 6 5 1 3 2 ',str);
@@ -197,13 +198,13 @@ tests.items.push(with_tests$('lists and trees',function(M){
           this.assertEquals(3,e.data$.tag);
 
           str = '';
-          entryops.walkAfter(e,function(e){
+          findops.walkAfter(e,function(e){
             str += e.data$.tag + ' ';
           });
           this.assertEquals('4 5 6 ',str);
 
           str = '';
-          entryops.walkBefore(e,function(e){
+          findops.walkBefore(e,function(e){
             str += e.data$.tag + ' ';
           });
           this.assertEquals('2 ',str);
@@ -218,7 +219,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
           this.assertEquals(5,e.data$.tag);
 
           str = '';
-          entryops.walkBefore(e,function(e){
+          findops.walkBefore(e,function(e){
             if(e.data$.tag==3) return true;
             str += e.data$.tag + ' ';
           });
@@ -231,7 +232,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
           var entry = tree.children$.head.children$.head;
           var result = [];
           this.assertEquals(2,entry.data$.tag);
-          entryops.walkParents(entry,function(p){
+          findops.walkParents(entry,function(p){
             result.push(p);
           });
           this.assertEquals(1,result[0].data$.tag);
