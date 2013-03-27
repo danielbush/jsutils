@@ -77,6 +77,41 @@ $dlb_id_au$.utils.findops = function() {
     }
   };
 
+  // Cycle through a list.
+  //
+  // This is a convenience function.
+  // 
+  // TODO: handle |n| > 1 .
+  // 
+  // cycle(1) = go one forward
+  // cycle(0) = return current entry
+  // cycle(-1) = go one back
+  // 
+  // If the end of the list is reached at either end we loop round.
+  // Also:
+  // cycle() = cycle(1)
+
+  module.cycle = function(start,n) {
+    if(!n) n = 1;
+    if(n==0) {
+      return start;
+    }
+    if(n>0) {
+      if(start.next$) {
+        return start.next$;
+      } else {
+        return module.head(start);
+      }
+    }
+    if(n<0) {
+      if(start.previous$) {
+        return start.previous$;
+      } else {
+        return module.tail(start);
+      }
+    }
+  }
+
   // Walk a tree of entries with entry as root depth-first.
 
   module.walk = function(entry,visit,postVisit) {

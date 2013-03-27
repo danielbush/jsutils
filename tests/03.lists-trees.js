@@ -159,6 +159,31 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
     M.tests('Walking, finding, counting...',function(M){
 
+      M.test('cycling forward',function() {
+        var head = makeTestList(4);
+        var entry;
+        entry = findops.cycle(head);
+        this.assertEquals(2,entry.data$.tag);
+        entry = findops.cycle(entry);
+        this.assertEquals(3,entry.data$.tag);
+        entry = findops.cycle(entry);
+        this.assertEquals(4,entry.data$.tag);
+        entry = findops.cycle(entry);
+        this.assertEquals('Should loop back.',1,entry.data$.tag);
+      });
+
+      M.test('cycling back',function() {
+        var tail = findops.tail(makeTestList(4));
+        var entry = findops.cycle(tail,-1);
+        this.assertEquals(3,entry.data$.tag);
+        var entry = findops.cycle(entry,-1);
+        this.assertEquals(2,entry.data$.tag);
+        var entry = findops.cycle(entry,-1);
+        this.assertEquals(1,entry.data$.tag);
+        var entry = findops.cycle(entry,-1);
+        this.assertEquals('Should loop back.',4,entry.data$.tag);
+      });
+
       M.test('sibwalking',function() {
         var str = '';
         var head = makeTestList(4);
