@@ -41,14 +41,6 @@ $dlb_id_au$.utils.findops = function() {
     return head;
   };
 
-  module.get = function(entry,key) {
-    if(!entry.data$[key]) {
-      entry.data$[key] = {};
-    }
-    return entry.data$[key];
-  };
-
-
   // Walk a linked list starting at 'start'.
   //
   // If 'fn' returns truthy, then stop.

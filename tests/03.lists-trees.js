@@ -103,7 +103,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
     var makeTestEntry = function(d){
       var e = data2.makeEntry();
-      e.data$.tag = d;
+      e.tag = d;
       return e;
     };
 
@@ -163,32 +163,32 @@ tests.items.push(with_tests$('lists and trees',function(M){
         var head = makeTestList(4);
         var entry;
         entry = findops.cycle(head);
-        this.assertEquals(2,entry.data$.tag);
+        this.assertEquals(2,entry.tag);
         entry = findops.cycle(entry);
-        this.assertEquals(3,entry.data$.tag);
+        this.assertEquals(3,entry.tag);
         entry = findops.cycle(entry);
-        this.assertEquals(4,entry.data$.tag);
+        this.assertEquals(4,entry.tag);
         entry = findops.cycle(entry);
-        this.assertEquals('Should loop back.',1,entry.data$.tag);
+        this.assertEquals('Should loop back.',1,entry.tag);
       });
 
       M.test('cycling back',function() {
         var tail = findops.tail(makeTestList(4));
         var entry = findops.cycle(tail,-1);
-        this.assertEquals(3,entry.data$.tag);
+        this.assertEquals(3,entry.tag);
         var entry = findops.cycle(entry,-1);
-        this.assertEquals(2,entry.data$.tag);
+        this.assertEquals(2,entry.tag);
         var entry = findops.cycle(entry,-1);
-        this.assertEquals(1,entry.data$.tag);
+        this.assertEquals(1,entry.tag);
         var entry = findops.cycle(entry,-1);
-        this.assertEquals('Should loop back.',4,entry.data$.tag);
+        this.assertEquals('Should loop back.',4,entry.tag);
       });
 
       M.test('sibwalking',function() {
         var str = '';
         var head = makeTestList(4);
         findops.sibwalk(head,function(entry){
-          str += entry.data$.tag + ' ';
+          str += entry.tag + ' ';
         });
         this.assertEquals('1 2 3 4 ',str);
         this.assertEquals(4,findops.count(head));
@@ -204,13 +204,13 @@ tests.items.push(with_tests$('lists and trees',function(M){
           var tree = makeTestTree(2,2);
           var str = '';
           findops.walk(tree,function(e){
-            str+=e.data$.tag+' ';
+            str+=e.tag+' ';
           });
           this.assertEquals('0 1 2 3 4 5 6 ',str);
 
           str = '';
           findops.walkback(tree,function(e){
-            str+=e.data$.tag+' ';
+            str+=e.tag+' ';
           });
           this.assertEquals('0 4 6 5 1 3 2 ',str);
         });
@@ -220,17 +220,17 @@ tests.items.push(with_tests$('lists and trees',function(M){
           var e,str;
 
           e = tree.children$.head.children$.head.next$;
-          this.assertEquals(3,e.data$.tag);
+          this.assertEquals(3,e.tag);
 
           str = '';
           findops.walkAfter(e,function(e){
-            str += e.data$.tag + ' ';
+            str += e.tag + ' ';
           });
           this.assertEquals('4 5 6 ',str);
 
           str = '';
           findops.walkBefore(e,function(e){
-            str += e.data$.tag + ' ';
+            str += e.tag + ' ';
           });
           this.assertEquals('2 ',str);
         });
@@ -241,12 +241,12 @@ tests.items.push(with_tests$('lists and trees',function(M){
           var e,str;
 
           e = tree.children$.head.next$.children$.head;
-          this.assertEquals(5,e.data$.tag);
+          this.assertEquals(5,e.tag);
 
           str = '';
           findops.walkBefore(e,function(e){
-            if(e.data$.tag==3) return true;
-            str += e.data$.tag + ' ';
+            if(e.tag==3) return true;
+            str += e.tag + ' ';
           });
           this.assertEquals('1 ',str);
 
@@ -256,12 +256,12 @@ tests.items.push(with_tests$('lists and trees',function(M){
           var tree = makeTestTree(2,2);
           var entry = tree.children$.head.children$.head;
           var result = [];
-          this.assertEquals(2,entry.data$.tag);
+          this.assertEquals(2,entry.tag);
           findops.walkParents(entry,function(p){
             result.push(p);
           });
-          this.assertEquals(1,result[0].data$.tag);
-          this.assertEquals(0,result[1].data$.tag);
+          this.assertEquals(1,result[0].tag);
+          this.assertEquals(0,result[1].tag);
         });
 
 

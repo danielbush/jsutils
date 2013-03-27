@@ -11,8 +11,7 @@ $dlb_id_au$.utils.data2 = function() {
       parentEntry$:null,
       children$:{
         head:null
-      },
-      data$:{}
+      }
     };
   };
 
