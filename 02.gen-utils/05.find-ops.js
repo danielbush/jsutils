@@ -109,8 +109,7 @@ $dlb_id_au$.utils.findops = function() {
 
   // Find the next node to be pre-visited after start.
 
-  module.cycleNext = function(start,n) {
-    if(!n) n = 1;
+  module.cycleNext = function(start) {
     var found = null;
 
     var preVisit = function(e){
@@ -135,6 +134,7 @@ $dlb_id_au$.utils.findops = function() {
     }
     return found;
   };
+
 
   // Walk a tree of entries with entry as root depth-first.
 
