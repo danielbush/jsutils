@@ -271,19 +271,19 @@ tests.items.push(with_tests$('lists and trees',function(M){
         M.test('cycling forward',function() {
           var tree = makeTestTree(2,2);
           var e;
-          e = findops.cycleTree(tree);
+          e = findops.cycleNext(tree);
           this.assertEquals(1,e.tag);
-          e = findops.cycleTree(e);
+          e = findops.cycleNext(e);
           this.assertEquals(2,e.tag);
-          e = findops.cycleTree(e);
+          e = findops.cycleNext(e);
           this.assertEquals(3,e.tag);
-          e = findops.cycleTree(e);
+          e = findops.cycleNext(e);
           this.assertEquals(4,e.tag);
-          e = findops.cycleTree(e);
+          e = findops.cycleNext(e);
           this.assertEquals(5,e.tag);
-          e = findops.cycleTree(e);
+          e = findops.cycleNext(e);
           this.assertEquals(6,e.tag);
-          e = findops.cycleTree(e);
+          e = findops.cycleNext(e);
           this.assertEquals('Should cycle back to root.',0,e.tag);
         });
 

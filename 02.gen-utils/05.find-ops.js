@@ -69,7 +69,7 @@ $dlb_id_au$.utils.findops = function() {
     }
   };
 
-  // Cycle through a list.
+  // Cycle through a list (siblings).
   //
   // This is a convenience function.
   // 
@@ -109,7 +109,7 @@ $dlb_id_au$.utils.findops = function() {
 
   // Find the next node to be pre-visited after start.
 
-  module.cycleTree = function(start,n) {
+  module.cycleNext = function(start,n) {
     if(!n) n = 1;
     var found = null;
 
