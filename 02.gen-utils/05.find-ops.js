@@ -115,12 +115,10 @@ $dlb_id_au$.utils.findops = function() {
 
     var preVisit = function(e){
       if(e==start) return;
-      if(!e.ignoreFocus) {
-        found = e;
-        return true;
-      }
+      found = e;
+      return true;
     };
-    // Walk subtree of lastFocused ignoring lastFocused.
+    // Walk subtree of start ignoring start.
     module.walk(start,preVisit);
     // Now ascend...
     if(!found) {
