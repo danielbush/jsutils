@@ -127,10 +127,6 @@ tests.items.push(with_tests$('lists and trees',function(M){
     //
     // Example: n=2, levels = 0 to 2, depth = 2
     //      0
-    //   1      2
-    // 3   4  5   6
-    // 
-    //      0
     //   1      4
     // 2   3  5   6
 
@@ -207,16 +203,24 @@ tests.items.push(with_tests$('lists and trees',function(M){
         M.test('basic walk/walkback',function(){
           var tree = makeTestTree(2,2);
           var str = '';
+          var str2 = '';
           findops.walk(tree,function(e){
             str+=e.tag+' ';
           });
           this.assertEquals('0 1 2 3 4 5 6 ',str);
 
           str = '';
-          findops.walkback(tree,function(e){
-            str+=e.tag+' ';
-          });
+          findops.walkback(
+            tree,
+            function(e){
+              str+=e.tag+' ';
+            },
+            function(e){
+              str2+=e.tag+' ';
+            }
+          );
           this.assertEquals('0 4 6 5 1 3 2 ',str);
+          this.assertEquals('6 5 4 3 2 1 0 ',str2);
         });
 
         M.test('walkAfter/walkBefore',function(){
@@ -232,11 +236,36 @@ tests.items.push(with_tests$('lists and trees',function(M){
           });
           this.assertEquals('4 5 6 ',str);
 
+          this.assertEquals('just checking',3,e.tag);
           str = '';
-          findops.walkBefore(e,function(e){
-            str += e.tag + ' ';
-          });
-          this.assertEquals('2 ',str);
+          str2 = '';
+          findops.walkBefore(
+            e,
+            function(e2){
+              e = e2;
+              str += e2.tag + ' ';
+            },
+            function(e2){
+              str2 += e2.tag + ' ';
+            }
+          );
+          this.assertEquals('previsit order','2 ',str);
+          this.assertEquals('postvisit order','2 1 0 ',str2);
+
+          this.assertEquals('just checking',2,e.tag);
+          str = '';
+          str2 = '';
+          findops.walkBefore(
+            e,
+            function(e){
+              str += e.tag + ' ';
+            },
+            function(e){
+              str2 += e.tag + ' ';
+            }
+          );
+          this.assertEquals('',str);
+          this.assertEquals('1 0 ',str2);
         });
 
         M.test('breaking behaviour',function(){
@@ -268,7 +297,14 @@ tests.items.push(with_tests$('lists and trees',function(M){
           this.assertEquals(0,result[1].tag);
         });
 
-        M.test('cycling forward',function() {
+        M.test('last',function() {
+          var tree = makeTestTree(2,2);
+          var e = findops.last(tree);
+          this.assertEquals(6,e.tag);
+        });
+
+
+        M.test('cycleNext',function() {
           var tree = makeTestTree(2,2);
           var e;
           e = findops.cycleNext(tree);
@@ -285,6 +321,27 @@ tests.items.push(with_tests$('lists and trees',function(M){
           this.assertEquals(6,e.tag);
           e = findops.cycleNext(e);
           this.assertEquals('Should cycle back to root.',0,e.tag);
+        });
+
+        M.test('cyclePrevious',function() {
+          var tree = makeTestTree(2,2);
+          var e;
+          e = findops.cyclePrevious(tree);
+          this.assertEquals(6,e.tag);
+          e = findops.cyclePrevious(e);
+          this.assertEquals(5,e.tag);
+          e = findops.cyclePrevious(e);
+          this.assertEquals(4,e.tag);
+          e = findops.cyclePrevious(e);
+          this.assertEquals(3,e.tag);
+          e = findops.cyclePrevious(e);
+          this.assertEquals(2,e.tag);
+          e = findops.cyclePrevious(e);
+          this.assertEquals(1,e.tag);
+          e = findops.cyclePrevious(e);
+          this.assertEquals(0,e.tag);
+          e = findops.cyclePrevious(e);
+          this.assertEquals('Should wrap.',6,e.tag);
         });
 
       });

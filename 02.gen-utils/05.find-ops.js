@@ -107,6 +107,20 @@ $dlb_id_au$.utils.findops = function() {
     }
   };
 
+  // Find last node in tree.
+  //
+  // This is the last node to be pre-visited.
+
+  module.last = function(start) {
+    var tail;
+    tail = module.tail(start);
+    if(tail.children$.head) {
+      return module.last(tail.children$.head)
+    } else {
+      return tail;
+    }
+  };
+
   // Find the next node to be pre-visited after start.
 
   module.cycleNext = function(start) {
@@ -135,6 +149,29 @@ $dlb_id_au$.utils.findops = function() {
     return found;
   };
 
+  module.cyclePrevious = function(start) {
+    var found = null;
+    if(!start.parentEntry$) {
+      return module.last(start);
+    }
+    //console.log(start.tag);
+    var preVisit = function(e){
+      //console.log('looking at '+e.tag);
+      if(e==start) return;
+      found = e;
+      return true;
+    };
+    console.log('walkBefore');
+    // Walk subtree of start ignoring start.
+    module.walkBefore(start,null,preVisit);
+    // Now ascend...
+    if(!found) {
+      //console.log('walkback');
+      module.walkback(start,preVisit);
+    }
+    //console.log('STOP');
+    return found;
+  };
 
   // Walk a tree of entries with entry as root depth-first.
 
@@ -186,6 +223,11 @@ $dlb_id_au$.utils.findops = function() {
   // direction.
   //
   // visit becomes postVisit and vice versa.
+  //
+  // TIP
+  // Linearise the tree by turning it into an outline.
+  // walkback/postVisit will visit this outline in reverse order.
+  // Whereas walk/previst visit this outline in forward order.
 
   module.walkback = function(entry,visit,postVisit) {
     var e,r;
@@ -195,7 +237,6 @@ $dlb_id_au$.utils.findops = function() {
     }
     if(e=entry.children$.head) {
       e = module.tail(e);
-      console.log(e);
       for(;e;e=e.previous$) {
         r = module.walkback(e,visit,postVisit);
         if(r) return r;  // break in sibwalkback
@@ -210,7 +251,7 @@ $dlb_id_au$.utils.findops = function() {
 
   // Walk back from entry, don't pre/post visit entry.
   //
-  // Same direction as walkback.
+  // Same direction as walkback.  See walkback.
 
   module.walkBefore = function(entry,visit,postVisit) {
     var r;
