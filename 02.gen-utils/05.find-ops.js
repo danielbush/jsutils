@@ -82,6 +82,9 @@ $dlb_id_au$.utils.findops = function() {
   // If the end of the list is reached at either end we loop round.
   // Also:
   // cycle() = cycle(1)
+  //
+  // MOTIVATION
+  // To cycle through lists eg a control.
 
   module.cycle = function(start,n) {
     if(!n) n = 1;
@@ -102,7 +105,38 @@ $dlb_id_au$.utils.findops = function() {
         return module.tail(start);
       }
     }
-  }
+  };
+
+  // Find the next node to be pre-visited after start.
+
+  module.cycleTree = function(start,n) {
+    if(!n) n = 1;
+    var found = null;
+
+    var preVisit = function(e){
+      if(e==start) return;
+      if(!e.ignoreFocus) {
+        found = e;
+        return true;
+      }
+    };
+    // Walk subtree of lastFocused ignoring lastFocused.
+    module.walk(start,preVisit);
+    // Now ascend...
+    if(!found) {
+      module.walkAfter(
+        start,
+        preVisit,
+        // This postvisit allows us to cycle.
+        function(e){
+          if(!e.parentEntry$) {
+            found = e;
+            return true;
+          }
+        });
+    }
+    return found;
+  };
 
   // Walk a tree of entries with entry as root depth-first.
 
@@ -124,9 +158,14 @@ $dlb_id_au$.utils.findops = function() {
     }
   };
 
-  // Walk past entry, don't pre/post visit entry.
+
+  // Walk after entry.
   //
-  // It's as if we just postVisited entry.
+  // It's as if we've just postVisited entry.
+  // If you want to visit entry and its descendents, use 'walk' since
+  // walk will restrict itself to the subtree rooted in entry.
+  // If you want to walk before entry going in the oppositie
+  // direction consider walkback/walkBefore.
 
   module.walkAfter = function(entry,visit,postVisit) {
     var r;
@@ -147,6 +186,8 @@ $dlb_id_au$.utils.findops = function() {
 
   // Walk a tree of entries with entry as root in the opposite
   // direction.
+  //
+  // visit becomes postVisit and vice versa.
 
   module.walkback = function(entry,visit,postVisit) {
     var e,r;

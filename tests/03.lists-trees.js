@@ -130,6 +130,9 @@ tests.items.push(with_tests$('lists and trees',function(M){
     //   1      2
     // 3   4  5   6
     // 
+    //      0
+    //   1      4
+    // 2   3  5   6
 
     var makeTestTree = function(n,depth) {
       if(!n) n = 2;
@@ -200,6 +203,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
       });
 
       M.tests('tree walking',function(M) {
+
         M.test('basic walk/walkback',function(){
           var tree = makeTestTree(2,2);
           var str = '';
@@ -264,6 +268,24 @@ tests.items.push(with_tests$('lists and trees',function(M){
           this.assertEquals(0,result[1].tag);
         });
 
+        M.test('cycling forward',function() {
+          var tree = makeTestTree(2,2);
+          var e;
+          e = findops.cycleTree(tree);
+          this.assertEquals(1,e.tag);
+          e = findops.cycleTree(e);
+          this.assertEquals(2,e.tag);
+          e = findops.cycleTree(e);
+          this.assertEquals(3,e.tag);
+          e = findops.cycleTree(e);
+          this.assertEquals(4,e.tag);
+          e = findops.cycleTree(e);
+          this.assertEquals(5,e.tag);
+          e = findops.cycleTree(e);
+          this.assertEquals(6,e.tag);
+          e = findops.cycleTree(e);
+          this.assertEquals('Should cycle back to root.',0,e.tag);
+        });
 
       });
       
