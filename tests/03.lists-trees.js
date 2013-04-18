@@ -3,9 +3,10 @@
 tests.items.push(with_tests$('lists and trees',function(M){
 
   var gen_utils = $dlb_id_au$.utils.gen_utils;
-  var data2 = $dlb_id_au$.utils.data2;
-  var findops = $dlb_id_au$.utils.findops;
-  var editops = $dlb_id_au$.utils.editops;
+
+  var data2     = $dlb_id_au$.utils.listtree.data2;
+  var findops   = $dlb_id_au$.utils.listtree.findops;
+  var editops   = $dlb_id_au$.utils.listtree.editops;
 
   M.tests('data2 list/tree ops',function(M){
 

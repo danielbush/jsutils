@@ -12,11 +12,11 @@ see <http://www.gnu.org/licenses/>.
 // The only thing assumed here are entries with next/previous
 // referring to other entries.
 
-$dlb_id_au$.utils.editops = function() {
+$dlb_id_au$.utils.listtree.editops = function() {
 
   var module = {};
-  var data = $dlb_id_au$.utils.data2;
-  var findops = $dlb_id_au$.utils.findops;
+  var data = $dlb_id_au$.utils.listtree.data2;
+  var findops = $dlb_id_au$.utils.listtree.findops;
 
   // Determine if entry is head of parent list.
 
