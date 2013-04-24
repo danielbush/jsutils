@@ -1,4 +1,5 @@
-01.globals.js
+00.globals.js
+01.facets.js
 02.gen-utils/01.utils.js
 02.gen-utils/12.stack.js
 03.list-tree/02.data2.js
