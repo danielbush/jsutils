@@ -69,6 +69,11 @@ $dlb_id_au$.utils.facets = function() {
 
   var module = {};
 
+  // Return a function that takes an object (o) and adds a facet (f)
+  // to it.
+  //
+  // f is an object stored in $$typeName, a property of o.
+
   module.makeFacet = function(typeName,makeFn) {
     typeName = '$$' + typeName;
     return function(o,params) {
@@ -77,6 +82,27 @@ $dlb_id_au$.utils.facets = function() {
         o[typeName].$$parent = o;
       }
       return o[typeName];
+    };
+  };
+
+  // Return 2 functions.
+  //
+  // A facet-making function for typename/makefn and a test function
+  // to test for the facet in some object.
+
+  module.makeFacet2 = function(typeName,makeFn) {
+    typeName = '$$' + typeName;
+    return {
+      make:function(o,params) {
+        if(!o[typeName]) {
+          o[typeName] = makeFn.apply(null,params);
+          o[typeName].$$parent = o;
+        }
+        return o[typeName];
+      },
+      test:function(o) {
+        return o[typeName];
+      }
     };
   };
 

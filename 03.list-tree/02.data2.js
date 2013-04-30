@@ -17,7 +17,9 @@ $dlb_id_au$.utils.listtree.data2 = function() {
   };
 
   // Create facet function for utils listtree:
-  module.list = facets.makeFacet('list',module.makeEntry);
+  var listfacet = facets.makeFacet2('list',module.makeEntry);
+  module.list = listfacet.make;
+  module.isList = listfacet.test;
 
   // Standard deref function:
   module.deref = facets.deref;
