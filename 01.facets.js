@@ -93,7 +93,7 @@ $dlb_id_au$.utils.facets = function() {
   module.makeFacet2 = function(typeName,makeFn) {
     typeName = '$$' + typeName;
     return {
-      make:function(o,params) {
+      get:function(o,params) {
         if(!o[typeName]) {
           o[typeName] = makeFn.apply(null,params);
           o[typeName].$$parent = o;
