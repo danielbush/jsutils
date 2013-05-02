@@ -41,6 +41,12 @@ $dlb_id_au$.utils.listtree.findops = function() {
     return head;
   };
 
+  // Get the first child.
+
+  module.firstChild = function(entry) {
+    return entry.firstChild$;
+  };
+
   // Walk a linked list starting at 'start'.
   //
   // If 'fn' returns truthy, then stop.
@@ -114,8 +120,8 @@ $dlb_id_au$.utils.listtree.findops = function() {
   module.last = function(start) {
     var tail;
     tail = module.tail(start);
-    if(tail.children$.head) {
-      return module.last(tail.children$.head)
+    if(tail.firstChild$) {
+      return module.last(tail.firstChild$)
     } else {
       return tail;
     }
@@ -181,7 +187,7 @@ $dlb_id_au$.utils.listtree.findops = function() {
       r = visit(entry);
       if(r) return r;
     }
-    if(e=entry.children$.head) {
+    if(e=entry.firstChild$) {
       for(;e;e=e.next$) {
         r = module.walk(e,visit,postVisit);
         if(r) return r;
@@ -235,7 +241,7 @@ $dlb_id_au$.utils.listtree.findops = function() {
       r = visit(entry);
       if(r) return r;
     }
-    if(e=entry.children$.head) {
+    if(e=entry.firstChild$) {
       e = module.tail(e);
       for(;e;e=e.previous$) {
         r = module.walkback(e,visit,postVisit);

@@ -10,19 +10,15 @@ $dlb_id_au$.utils.listtree.data2 = function() {
       next$:null,
       previous$:null,
       parentEntry$:null,
-      children$:{
-        head:null
-      }
+      firstChild$:null
     };
   };
 
   // Create facet function for utils listtree:
-  var listfacet = facets.makeFacet2('list',module.makeEntry);
-  module.list = listfacet.make;
-  module.isList = listfacet.test;
+  module.facet = facets.makeFacet2('list',module.makeEntry);
 
   // Standard deref function:
-  module.deref = facets.deref;
+  module.facet.deref = facets.deref;
 
   return module;
 

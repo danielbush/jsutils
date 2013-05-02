@@ -22,7 +22,7 @@ $dlb_id_au$.utils.listtree.editops = function() {
 
   var isHead = function(entry) {
     if(entry.parentEntry$) {
-      return (entry.parentEntry$.children$.head == entry);
+      return (entry.parentEntry$.firstChild$ == entry);
     }
   };
 
@@ -49,7 +49,7 @@ $dlb_id_au$.utils.listtree.editops = function() {
 
     // Update parent's children.
     if(isHead(e2)) {
-      e2.parentEntry$.children$.head = e1;
+      e2.parentEntry$.firstChild$ = e1;
     }
 
     return e1;
@@ -96,7 +96,7 @@ $dlb_id_au$.utils.listtree.editops = function() {
 
     // Update parent's children.
     if(isHead(entry)) {
-      entry.parentEntry$.children$.head = entry.next;
+      entry.parentEntry$.firstChild$ = entry.next;
     }
 
     return entry;
@@ -109,11 +109,11 @@ $dlb_id_au$.utils.listtree.editops = function() {
       ep = ec;
       ec = data.makeEntry();
     }
-    if(!ep.children$.head) {
-      ep.children$.head = ec;
+    if(!ep.firstChild$) {
+      ep.firstChild$ = ec;
       ec.parentEntry$ = ep;
     } else {
-      tail = findops.tail(ep.children$.head);
+      tail = findops.tail(ep.firstChild$);
       module.insertAfter(ec,tail);
     }
     return ec;

@@ -56,13 +56,13 @@ tests.items.push(with_tests$('lists and trees',function(M){
         e1 = data2.makeEntry();
         e2 = data2.makeEntry();
         editops.appendChild(e2,e1);
-        this.assert(e1.children$.head==e2);
+        this.assert(e1.firstChild$==e2);
         this.assert(e2.parentEntry$==e1);
 
         e3 = data2.makeEntry();
         editops.appendChild(e3,e1);
-        this.assert(e1.children$.head==e2);
-        this.assert(e1.children$.head.next$==e3);
+        this.assert(e1.firstChild$==e2);
+        this.assert(e1.firstChild$.next$==e3);
         this.assert(e3.parentEntry$==e1);
 
         e = editops.insertAfter(e3);
@@ -94,7 +94,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
       M.test('1 arg...',function(){
         e1 = data2.makeEntry();
         e2 = editops.appendChild(e1);
-        this.assert(e1.children$.head==e2);
+        this.assert(e1.firstChild$==e2);
         this.assert(e2.parentEntry$==e1);
       });
 
@@ -228,7 +228,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
           var tree = makeTestTree(2,2);
           var e,str;
 
-          e = tree.children$.head.children$.head.next$;
+          e = tree.firstChild$.firstChild$.next$;
           this.assertEquals(3,e.tag);
 
           str = '';
@@ -274,7 +274,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
           var tree = makeTestTree(2,2);
           var e,str;
 
-          e = tree.children$.head.next$.children$.head;
+          e = tree.firstChild$.next$.firstChild$;
           this.assertEquals(5,e.tag);
 
           str = '';
@@ -288,7 +288,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
 
         M.test('parent walking',function() {
           var tree = makeTestTree(2,2);
-          var entry = tree.children$.head.children$.head;
+          var entry = tree.firstChild$.firstChild$;
           var result = [];
           this.assertEquals(2,entry.tag);
           findops.walkParents(entry,function(p){
