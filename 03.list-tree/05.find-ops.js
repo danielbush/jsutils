@@ -25,6 +25,8 @@ $dlb_id_au$.utils.listtree.findops = function() {
     return i;
   };
 
+  // Find tail entry of the current row.
+
   module.tail = function(start) {
     var n,tail=start;
     for(n=start;n;n=n.next$) {
@@ -33,12 +35,75 @@ $dlb_id_au$.utils.listtree.findops = function() {
     return tail;
   };
 
+  // Find head entry of the current row.
+
   module.head = function(start) {
     var n,head=start;
     for(n=start;n;n=n.previous$) {
       head = n;
     }
     return head;
+  };
+
+  // Find nth entry (zero-based) from start or return null.
+  //
+  // If n=0, return start.
+  //
+  // If flag is true, the head of start is used in place of start and
+  // n is assumed to be >= 0, not negative. This is just a
+  // convenience, so you don't have to call module.head on start
+  // yourself.
+  // Why bother? It allows us to treat a linked list a bit like an
+  // indexed array.
+
+  module.nth = function(n,start,flag) {
+    var i;
+    var found = null;
+    var head = start;
+    if(flag) {
+      if(n>=0) {
+        head = module.head(start);
+      }
+      else if(n<0) {
+        return null;
+      }
+    } 
+
+    if(n==0) {
+      found = head;
+    }
+    else if(n>0) {
+      for(found=head,i=1;i<=n;i++) {
+        found = found.next$;
+        if(!found) {
+          found = null;
+          break;
+        }
+      }
+    }
+    else if(n<0) {
+      for(found=head,i=-1;i>=n;i--) {
+        console.log(i);
+        found = found.previous$;
+        if(!found) {
+          found = null;
+          break;
+        }
+      }
+    }
+    return found;
+  };
+
+  // Get next entry in list.
+
+  module.next = function(start) {
+    return start.next$;
+  };
+
+  // Get previous entry in list.
+
+  module.previous = function(start) {
+    return start.previous$;
   };
 
   // Get the first child.
@@ -113,9 +178,23 @@ $dlb_id_au$.utils.listtree.findops = function() {
     }
   };
 
+  // Find first node in tree.
+
+  module.first = function(start) {
+    var root = start;
+    module.walkParents(start,function(p){
+      root = p;
+    });
+    // In case of multi-root tree:
+    root = module.head(root);
+    return root;
+  };
+
   // Find last node in tree.
   //
   // This is the last node to be pre-visited.
+  //
+  // @see module.head , module.tail for flat lists
 
   module.last = function(start) {
     var tail;

@@ -283,6 +283,25 @@ $dlb_id_au$.utils.gen_utils = function() {
     return o;
   };
 
+  module.when = function(condfn,fn,timeout,interval) {
+    var wid,elapsed=0;
+    if(!timeout) timeout = 0; // forever
+    if(!interval) interval = 300;
+    wid = setInterval(function(){
+      if(condfn()) {
+        fn();
+        window.clearInterval(wid);
+      }
+      if(timeout > 0) {
+        elapsed+=interval;
+        if(elapsed > timeout) {
+          window.clearInterval(wid);
+        }
+      }
+    },interval);
+    return wid;
+  };
+
   return module;
 
 }();

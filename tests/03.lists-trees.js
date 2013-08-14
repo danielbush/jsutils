@@ -199,6 +199,34 @@ tests.items.push(with_tests$('lists and trees',function(M){
         );
       });
 
+      M.test('next/previous',function() {
+        var head = makeTestList(4);
+        var n;
+        this.assertEquals(2,(n=findops.next(head)).tag);
+        this.assertEquals(1,findops.previous(n).tag);
+      });
+      M.test('find nth',function() {
+        var head = makeTestList(4);
+        var tail = findops.tail(head);
+        var n;
+        this.assertEquals('n>0 / flag=true',
+                          1,(n=findops.nth(0,head,true)).tag);
+        this.assertEquals(2,(n=findops.nth(1,head,true)).tag);
+        this.assertEquals(3,(n=findops.nth(2,head,true)).tag);
+        this.assertEquals(4,(n=findops.nth(3,head,true)).tag);
+
+        this.assertEquals('n>0 / flag=true / non-head start',
+                          2,(n=findops.nth(1,head.next$,true)).tag);
+        this.assertEquals('n>0 / flag=false / non-head start',
+                          3,(n=findops.nth(1,head.next$,false)).tag);
+
+        this.assertEquals('From non-head position.',
+                          3,(n=findops.nth(2,tail,true)).tag);
+
+        this.assertEquals('n<0 / flag=false',
+                          3,(n=findops.nth(-1,tail,false)).tag);
+      });
+
       M.tests('tree walking',function(M) {
 
         M.test('basic walk/walkback',function(){
@@ -296,6 +324,12 @@ tests.items.push(with_tests$('lists and trees',function(M){
           });
           this.assertEquals(1,result[0].tag);
           this.assertEquals(0,result[1].tag);
+        });
+
+        M.test('first',function() {
+          var tree = makeTestTree(2,2);
+          var e = findops.first(tree);
+          this.assertEquals(0,e.tag);
         });
 
         M.test('last',function() {

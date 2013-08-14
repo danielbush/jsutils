@@ -102,6 +102,7 @@ $dlb_id_au$.utils.listtree.editops = function() {
     return entry;
   };
 
+  // Append ec to ep.
 
   module.appendChild = function(ec,ep) {
     var tail;

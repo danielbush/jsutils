@@ -55,6 +55,28 @@ tests.items.push(with_tests$('01.utils',function(M){
       this.assertEquals('Original is not altered.',o.a,1);
     });
 
+    M.test('when (aysynchronous, check console log for results)',function(){
+      var SIGNAL = false;
+      var RESULT = 0;
+      var condfn,fn,that=this;
+      condfn = function() {
+        if(SIGNAL) return true;
+      };
+      fn = function() {
+        RESULT+=1;
+      };
+      utils.gen_utils.when(condfn,fn,0,100);
+      this.assertEquals("fn should not be called yet.",0,RESULT);
+      SIGNAL = true;
+      // TODO: setTimeout is asynchronous.  unitjs can't handle this,
+      // and the assertion is not counted.  Atm, we're just updating
+      // the console.log.
+      setTimeout(function(){
+        console.log('RESULT should be 1, is:'+RESULT);
+        //that.assertEquals("fn should now be called.",1,RESULT);
+      },200);
+    });
+
   })
 
 );
