@@ -1,3 +1,4 @@
+
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
@@ -79,13 +80,15 @@ $dlb_id_au$.unitJS.data = function() {
 
       // Stats.
       // 
+      // @see makeStats
+      // 
       // Each 'tests' object will have 2 versions:
       // - one for test objects defined in items
       // - a cumulative one for test objects and the cumulative stats of
       //   tests objects in items.
 
-      stats:null,
-      cumulative:null,
+      stats:module.makeStats(),
+      cumulative:module.makeStats(),
 
       // Setup/teardown functions to be run before/after every
       // 'test' item in 'items'.
@@ -214,351 +217,108 @@ $dlb_id_au$.unitJS.utils = function() {
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
-   Copyright (C) 2009-2013 Daniel Bush
+   Copyright (C) 2014 Daniel Bush
    This program is distributed under the terms of the GNU
    General Public License.  A copy of the license should be
    enclosed with this project in the file LICENSE.  If not
    see <http://www.gnu.org/licenses/>.
   
-   Parts of this code relating to assertions were taken from the
-   JSUnit project: Edward Hieatt, edward@jsunit.net Copyright (C) 2003
-   All Rights Reserved.
-
 */
 
-// This module defines the available assertions that can be made in
-// your tests. It also provides a function 'doTest' that runs a test
-// data structure.
+// A singleton object that tracks things like assertion count during
+// the running of a single test.
+//
+// Use 'reset' before running each test.
+//
+// It should be very easy to turn this into an instantiable object
+// should we need to go down this path at some point.
 
-$dlb_id_au$.unitJS.assertions = function() {
+$dlb_id_au$.unitJS.testLifetime = function() {
 
   var module = {};
-  var utils = {};  // Util functions defined at bottom of this module.
-  var STATE     = $dlb_id_au$.unitJS.data.testStates;
 
-  // A singleton object that tracks things like assertion count during
-  // the running of a single test.
-  //
-  // Use 'reset' before running each test.
+  module.assertions = 0;  // must be reset on each run
+  module.assertion_level = 0;
 
-  module.testLifetime = {
-    assertions:0,  // must be reset on each run
-    assertion_level:0,
-    before_assert:function(){
-      this.assertion_level++;
-      if(this.assertion_level==1) {
-        this.assertions++;
-      }
-    },
-    after_assert:function(){
-      this.assertion_level--;
-    },
-    reset:function() {
-      this.assertions = 0;
-      this.assertion_level = 0;
+  // To be called before every assertion or it() within a test.
+  module.before_assert = function(){
+    module.assertion_level++;
+    if(module.assertion_level==1) {
+      module.assertions++;
     }
   };
 
-  // Wrap public assertions with a wrapper that calls
-  // before/after_assert etc
+  // To be called after every assertion or it() within a test.
+  module.after_assert = function(){
+    module.assertion_level--;
+  };
+
+  // To be called before running a test.
+  module.reset = function() {
+    module.assertions = 0;
+    module.assertion_level = 0;
+  };
+
+  console.log("loaded testLifetime");
+  return module;
+
+}();
+/*
+   This is a source file for UnitJS a unit testing framework
+   for javascript.
+   Copyright (C) 2014 Daniel Bush
+   This program is distributed under the terms of the GNU
+   General Public License.  A copy of the license should be
+   enclosed with this project in the file LICENSE.  If not
+   see <http://www.gnu.org/licenses/>.
+  
+*/
+
+// Utils for assisting with assertions and should.
+
+$dlb_id_au$.unitJS.assert_utils = function() {
+
+  var module = {};
+
+  module.compare = function(a,b) {
+    return (a===b);
+  };
+
+  // Check if both a,b are arrays.
+  module.do_array_compare = function(a,b) {
+    var a = (a.constructor == Array);
+    var b = (b.constructor == Array);
+    return (a && b);
+  };
+
+  // Recursively compare array of values.
   //
-  // Called at end of this module.
-
-  var wrapAssertions = function() {
-    for(var i in module) {
-      if(/^assert/.test(i)) {
-        module[i] = function(assert_fn) {
-          return function() {
-            module.testLifetime.before_assert();
-            assert_fn.apply(this,arguments);
-            module.testLifetime.after_assert();
-          };
-        }(module[i]);
-      }
-    }
-  };
-
-
-  // Public assertions start here...
-  //
-  // Most of this code including utils is taken directly
-  // from the original jsunit project.
-
-  var _UNDEFINED_VALUE;
-
-  var _assert = function(comment, booleanValue, assertionTypeMessage) {
-    if (!booleanValue) {
-      utils.fail(comment, assertionTypeMessage);
-    }
-  };
-
-  module.assert = function() {
-    utils._validateArguments(1, arguments);
-    var booleanValue = utils.nonCommentArg(1, 1, arguments);
-
-    if (typeof(booleanValue) != 'boolean')
-      utils.error('Bad argument to assert(boolean)');
-
-    _assert( utils.commentArg(1, arguments), 
-             booleanValue === true, 
-             'Call to assert(boolean) with false');
-  };
-
-  module.assertTrue = function() {
-    utils._validateArguments(1, arguments);
-    var booleanValue = utils.nonCommentArg(1, 1, arguments);
-
-    if (typeof(booleanValue) != 'boolean')
-      utils.error('Bad argument to assertTrue(boolean)');
-
-    _assert( utils.commentArg(1, arguments), 
-             booleanValue === true, 
-             'Call to assertTrue(boolean) with false');
-  };
-
-  module.assertFalse = function() {
-    utils._validateArguments(1, arguments);
-    var booleanValue = utils.nonCommentArg(1, 1, arguments);
-
-    if (typeof(booleanValue) != 'boolean')
-      utils.error('Bad argument to assertFalse(boolean)');
-
-    _assert( utils.commentArg(1, arguments), 
-             booleanValue === false, 
-             'Call to assertFalse(boolean) with true');
-  };
-
-  module.assertEquals = function() {
-    utils._validateArguments(2, arguments);
-    var var1 = utils.nonCommentArg(1, 2, arguments);
-    var var2 = utils.nonCommentArg(2, 2, arguments);
-    _assert( utils.commentArg(2, arguments), 
-             var1 === var2, 
-             'Expected ' + 
-             utils._displayStringForValue(var1) + 
-             ' but was ' + 
-             utils._displayStringForValue(var2));
-  };
-
-  module.assertNotEquals = function() {
-    utils._validateArguments(2, arguments);
-    var var1 = utils.nonCommentArg(1, 2, arguments);
-    var var2 = utils.nonCommentArg(2, 2, arguments);
-    _assert( utils.commentArg(2, arguments), 
-             var1 !== var2, 
-             'Expected not to be ' + 
-             utils._displayStringForValue(var2));
-  };
-
-  module.assertNull = function() {
-    utils._validateArguments(1, arguments);
-    var aVar = utils.nonCommentArg(1, 1, arguments);
-    _assert( utils.commentArg(1, arguments), 
-             aVar === null, 
-             'Expected ' + 
-             utils._displayStringForValue(null) + 
-             ' but was ' + 
-             utils._displayStringForValue(aVar));
-  };
-
-  module.assertNotNull = function() {
-    utils._validateArguments(1, arguments);
-    var aVar = utils.nonCommentArg(1, 1, arguments);
-    _assert( utils.commentArg(1, arguments), 
-             aVar !== null, 
-             'Expected not to be ' + 
-             utils._displayStringForValue(null));
-  };
-
-  module.assertUndefined = function() {
-    utils._validateArguments(1, arguments);
-    var aVar = utils.nonCommentArg(1, 1, arguments);
-    _assert( utils.commentArg(1, arguments), 
-             aVar === _UNDEFINED_VALUE, 
-             'Expected ' + 
-             utils._displayStringForValue(_UNDEFINED_VALUE) + 
-             ' but was ' + 
-             utils._displayStringForValue(aVar));
-  };
-
-  module.assertNotUndefined = function() {
-    utils._validateArguments(1, arguments);
-    var aVar = utils.nonCommentArg(1, 1, arguments);
-    _assert( utils.commentArg(1, arguments), 
-             aVar !== _UNDEFINED_VALUE, 
-             'Expected not to be ' + 
-             utils._displayStringForValue(_UNDEFINED_VALUE));
-  };
-
-  module.assertNaN = function() {
-    utils._validateArguments(1, arguments);
-    var aVar = utils.nonCommentArg(1, 1, arguments);
-    _assert(utils.commentArg(1, arguments), isNaN(aVar),
-            'Expected NaN');
-  };
-
-  module.assertNotNaN = function() {
-    utils._validateArguments(1, arguments);
-    var aVar = utils.nonCommentArg(1, 1, arguments);
-    _assert(utils.commentArg(1, arguments), !isNaN(aVar),
-            'Expected not NaN');
-  };
-
-  // More general version of assertEquals
-  // - assertEquals uses ===
-  // - here we use == on strings and numbers
-  //   so that object instances and literals are equal
-  //   (see Notes below)
+  // MOTIVATION
   // 
-  // Notes
-  // In javascript:
-  //   - 1 == '1' => true
-  //   - 'foo' == new String('foo')  => true
-  //   - 'foo' === new String('foo') => false
-  //
+  // Two empty arrays are different (both != and !==).
+  // When we're testing it's sometimes convenient
+  // to be able to compare an array of values.
 
-  module.assertObjectEquals = function() {
-    utils._validateArguments(2, arguments);
-    var var1 = utils.nonCommentArg(1, 2, arguments);
-    var var2 = utils.nonCommentArg(2, 2, arguments);
-    var type1 = utils._trueTypeOf(var1);
-    var type2 = utils._trueTypeOf(var2);
-    var msg = utils.commentArg(2, arguments) ? 
-      utils.commentArg(2, arguments):'';
-    var isSame = (var1 === var2);
-    var sameType = (type1 == type2);
-    var isEqual = isSame || sameType;
-    if(!isSame) {
-      switch (type1) {
-      case 'String':
-        if(type2!='String') {isEqual = false; break; }
-        isEqual = (var1 == var2);
-        break;
-      case 'Number':
-        if(type2!='Number') {isEqual = false; break; }
-        isEqual = (var1 == var2);
-        break;
-      case 'Boolean':
-      case 'Date':
-        isEqual = (var1 === var2);
-        break;
-      case 'RegExp':
-      case 'Function':
-        isEqual = (var1.toString() === var2.toString());
-        break;
-      default: //Object | Array
-        var i;
-        if (isEqual = (var1.length === var2.length))
-          for (i in var1)
-            module.assertObjectEquals(
-              msg + ' found nested ' + 
-                type1 + '@' + i + '\n', 
-              var1[i], var2[i]);
+  module.array_compare = function(arr1,arr2) {
+    var i,r;
+    if(arr1.length!==arr2.length) {
+      return false;
+    }
+    for(i=0;i<arr1.length;i++) {
+      if(module.do_array_compare(arr1[i],arr2[i])) {
+        r = module.array_compare(arr1[i],arr2[i]);
+        if(r) {
+          return true;
+        } else {
+          return false;
+        }
       }
-      _assert(msg, isEqual, 
-              'Expected ' + utils._displayStringForValue(var1) + 
-              ' but was ' + utils._displayStringForValue(var2));
+      else if(!module.compare(arr1[i],arr2[i])) {
+        return false;
+      }
     }
+    return true;
   };
-
-  module.assertArrayEquals = module.assertObjectEquals;
-
-  module.assertEvaluatesToTrue = function() {
-    utils._validateArguments(1, arguments);
-    var value = utils.nonCommentArg(1, 1, arguments);
-    if (!value)
-      utils.fail('',utils.commentArg(1, arguments));
-  };
-
-  module.assertEvaluatesToFalse = function() {
-    utils._validateArguments(1, arguments);
-    var value = utils.nonCommentArg(1, 1, arguments);
-    if (value)
-      utils.fail('',utils.commentArg(1, arguments));
-  };
-
-  module.assertHTMLEquals = function() {
-    utils._validateArguments(2, arguments);
-    var var1 = utils.nonCommentArg(1, 2, arguments);
-    var var2 = utils.nonCommentArg(2, 2, arguments);
-    var var1Standardized = utils.standardizeHTML(var1);
-    var var2Standardized = utils.standardizeHTML(var2);
-
-    _assert( utils.commentArg(2, arguments), 
-             var1Standardized === var2Standardized, 
-             'Expected ' + 
-             utils._displayStringForValue(var1Standardized) + 
-             ' but was ' + 
-             utils._displayStringForValue(var2Standardized));
-  };
-
-  module.assertHashEquals = function() {
-    utils._validateArguments(2, arguments);
-    var var1 = utils.nonCommentArg(1, 2, arguments);
-    var var2 = utils.nonCommentArg(2, 2, arguments);
-    for (var key in var1) {
-      module.assertNotUndefined(
-        "Expected hash had key " + key + 
-          " that was not found", var2[key]);
-      module.assertEquals(
-        "Value for key " + key + 
-          " mismatch - expected = " + var1[key] + 
-          ", actual = " + var2[key], var1[key], var2[key]);
-    }
-    for (var key in var2) {
-      module.assertNotUndefined(
-        "Actual hash had key " + key + 
-          " that was not expected", var1[key]);
-    }
-  };
-
-  module.assertRoughlyEquals = function() {
-    utils._validateArguments(3, arguments);
-    var expected = utils.nonCommentArg(1, 3, arguments);
-    var actual = utils.nonCommentArg(2, 3, arguments);
-    var tolerance = utils.nonCommentArg(3, 3, arguments);
-    module.assertTrue(
-      "Expected " + expected + 
-        ", but got " + actual + 
-        " which was more than " + tolerance + 
-        " away", Math.abs(expected - actual) < tolerance);
-  };
-
-  module.assertContains = function() {
-    utils._validateArguments(2, arguments);
-    var contained = utils.nonCommentArg(1, 2, arguments);
-    var container = utils.nonCommentArg(2, 2, arguments);
-    module.assertTrue(
-      "Expected '" + container + 
-        "' to contain '" + contained + "'",
-      container.indexOf(contained) != -1);
-  };
-
-  // Test if error object is a failure raised by an assertion.
-
-  module.assertFailure = function(comment, errorObject) {
-    module.assertNotNull(comment, errorObject);
-    module.assert(comment, errorObject.isFailure);
-    module.assertNotUndefined(comment, errorObject.comment);
-  };
-
-  // Test if error object is an error other than a failure
-  // (indicating an error has been thrown which is not related
-  // to an assertion/test).
-
-  module.assertError = function(comment, errorObject) {
-    module.assertNotNull(comment, errorObject);
-    module.assertUndefined(comment, errorObject.isFailure);
-    module.assertNotUndefined(comment, errorObject.description);
-  };
-
-
-  //------------------------------------------------------------
-  // Util functions for assertions
-  //
-  // Most of this code is carried over from the original
-  // js unit code that unitjs was based on.
-
 
   /**
    * A more functional typeof
@@ -566,7 +326,7 @@ $dlb_id_au$.unitJS.assertions = function() {
    * @return String
    */
 
-  utils._trueTypeOf = function(something) {
+  module.trueTypeOf = function(something) {
     var result = typeof something;
     try {
       switch (result) {
@@ -613,13 +373,15 @@ $dlb_id_au$.unitJS.assertions = function() {
     }
   };
 
-  utils._displayStringForValue = function(aVar) {
+  module.to_s = function(aVar) {
     var result = '<' + aVar + '>';
-    if (!(aVar === null || aVar === _UNDEFINED_VALUE)) {
-      result += ' (' + utils._trueTypeOf(aVar) + ')';
+    if (!(aVar === null || aVar === undefined)) {
+      result += ' (' + module.trueTypeOf(aVar) + ')';
     }
     return result;
   };
+
+  module.displayStringForValue = module.to_s;
 
   /*
    * Raise a failure - this should only be used when
@@ -628,58 +390,547 @@ $dlb_id_au$.unitJS.assertions = function() {
    * This involves raising an error and giving it a 
    * special flag and user comment field.
    *
+   * The comment field is optional and is not currently used by the
+   * 'shoulds' module. 
+   *
    */
 
-  utils.fail = function(comment,assertionTypeMessage) {
+  module.fail = function(comment,assertionTypeMessage) {
     var e = new Error(assertionTypeMessage);
     e.isFailure = true;
     e.comment = comment;
     throw e;
   };
 
-  utils.error = function(errorMessage) {
+  module.error = function(errorMessage) {
     var e = new Error(errorMessage);
     e.description = errorMessage;  // FIXME: Do we need this???
     throw e;
   };
 
-  utils.argumentsIncludeComments = function(expectedNumberOfNonCommentArgs,args) {
+
+  return module;
+
+}();
+/*
+   This is a source file for UnitJS a unit testing framework
+   for javascript.
+   Copyright (C) 2009-2013 Daniel Bush
+   This program is distributed under the terms of the GNU
+   General Public License.  A copy of the license should be
+   enclosed with this project in the file LICENSE.  If not
+   see <http://www.gnu.org/licenses/>.
+  
+   Parts of this code relating to assertions were taken from the
+   JSUnit project: Edward Hieatt, edward@jsunit.net Copyright (C) 2003
+   All Rights Reserved.
+
+*/
+
+// This module defines the available assertions that can be made in
+// your tests.
+//
+// This is being replaced by the 'shoulds' module.
+
+$dlb_id_au$.unitJS.assertions = function() {
+
+  var module    = {};
+  var utils     = $dlb_id_au$.unitJS.assert_utils;
+  var STATE     = $dlb_id_au$.unitJS.data.testStates;
+  var testLifetime = $dlb_id_au$.unitJS.testLifetime;
+
+  // Wrap public assertions with a wrapper that calls
+  // before/after_assert etc
+  //
+  // Called at end of this module.
+
+  var wrapAssertions = function() {
+    for(var i in module) {
+      if(/^assert/.test(i)) {
+        module[i] = function(assert_fn) {
+          return function() {
+            testLifetime.before_assert();
+            assert_fn.apply(this,arguments);
+            testLifetime.after_assert();
+          };
+        }(module[i]);
+      }
+    }
+  };
+
+
+  // Public assertions start here...
+  //
+  // Most of this code including utils is taken directly
+  // from the original jsunit project.
+
+  var _UNDEFINED_VALUE;
+
+  var _assert = function(comment, booleanValue, assertionTypeMessage) {
+    if (!booleanValue) {
+      utils.fail(comment, assertionTypeMessage);
+    }
+  };
+
+  module.assert = function() {
+    module._validateArguments(1, arguments);
+    var booleanValue = module.nonCommentArg(1, 1, arguments);
+
+    if (typeof(booleanValue) != 'boolean')
+      utils.error('Bad argument to assert(boolean)');
+
+    _assert( module.commentArg(1, arguments), 
+             booleanValue === true, 
+             'Call to assert(boolean) with false');
+  };
+
+  module.assertTrue = function() {
+    module._validateArguments(1, arguments);
+    var booleanValue = module.nonCommentArg(1, 1, arguments);
+
+    if (typeof(booleanValue) != 'boolean')
+      utils.error('Bad argument to assertTrue(boolean)');
+
+    _assert( module.commentArg(1, arguments), 
+             booleanValue === true, 
+             'Call to assertTrue(boolean) with false');
+  };
+
+  module.assertFalse = function() {
+    module._validateArguments(1, arguments);
+    var booleanValue = module.nonCommentArg(1, 1, arguments);
+
+    if (typeof(booleanValue) != 'boolean')
+      utils.error('Bad argument to assertFalse(boolean)');
+
+    _assert( module.commentArg(1, arguments), 
+             booleanValue === false, 
+             'Call to assertFalse(boolean) with true');
+  };
+
+  module.assertEquals = function() {
+    module._validateArguments(2, arguments);
+    var var1 = module.nonCommentArg(1, 2, arguments);
+    var var2 = module.nonCommentArg(2, 2, arguments);
+    _assert( module.commentArg(2, arguments), 
+             var1 === var2, 
+             'Expected ' + 
+             utils.displayStringForValue(var1) + 
+             ' but was ' + 
+             utils.displayStringForValue(var2));
+  };
+
+  module.assertNotEquals = function() {
+    module._validateArguments(2, arguments);
+    var var1 = module.nonCommentArg(1, 2, arguments);
+    var var2 = module.nonCommentArg(2, 2, arguments);
+    _assert( module.commentArg(2, arguments), 
+             var1 !== var2, 
+             'Expected not to be ' + 
+             utils.displayStringForValue(var2));
+  };
+
+  module.assertNull = function() {
+    module._validateArguments(1, arguments);
+    var aVar = module.nonCommentArg(1, 1, arguments);
+    _assert( module.commentArg(1, arguments), 
+             aVar === null, 
+             'Expected ' + 
+             utils.displayStringForValue(null) + 
+             ' but was ' + 
+             utils.displayStringForValue(aVar));
+  };
+
+  module.assertNotNull = function() {
+    module._validateArguments(1, arguments);
+    var aVar = module.nonCommentArg(1, 1, arguments);
+    _assert( module.commentArg(1, arguments), 
+             aVar !== null, 
+             'Expected not to be ' + 
+             utils.displayStringForValue(null));
+  };
+
+  module.assertUndefined = function() {
+    module._validateArguments(1, arguments);
+    var aVar = module.nonCommentArg(1, 1, arguments);
+    _assert( module.commentArg(1, arguments), 
+             aVar === _UNDEFINED_VALUE, 
+             'Expected ' + 
+             utils.displayStringForValue(_UNDEFINED_VALUE) + 
+             ' but was ' + 
+             utils.displayStringForValue(aVar));
+  };
+
+  module.assertNotUndefined = function() {
+    module._validateArguments(1, arguments);
+    var aVar = module.nonCommentArg(1, 1, arguments);
+    _assert( module.commentArg(1, arguments), 
+             aVar !== _UNDEFINED_VALUE, 
+             'Expected not to be ' + 
+             utils.displayStringForValue(_UNDEFINED_VALUE));
+  };
+
+  module.assertNaN = function() {
+    module._validateArguments(1, arguments);
+    var aVar = module.nonCommentArg(1, 1, arguments);
+    _assert(module.commentArg(1, arguments), isNaN(aVar),
+            'Expected NaN');
+  };
+
+  module.assertNotNaN = function() {
+    module._validateArguments(1, arguments);
+    var aVar = module.nonCommentArg(1, 1, arguments);
+    _assert(module.commentArg(1, arguments), !isNaN(aVar),
+            'Expected not NaN');
+  };
+
+  // More general version of assertEquals
+  // - assertEquals uses ===
+  // - here we use == on strings and numbers
+  //   so that object instances and literals are equal
+  //   (see Notes below)
+  // 
+  // Notes
+  // In javascript:
+  //   - 1 == '1' => true
+  //   - 'foo' == new String('foo')  => true
+  //   - 'foo' === new String('foo') => false
+  //
+
+  module.assertObjectEquals = function() {
+    module._validateArguments(2, arguments);
+    var var1 = module.nonCommentArg(1, 2, arguments);
+    var var2 = module.nonCommentArg(2, 2, arguments);
+    var type1 = utils.trueTypeOf(var1);
+    var type2 = utils.trueTypeOf(var2);
+    var msg = module.commentArg(2, arguments) ? 
+      module.commentArg(2, arguments):'';
+    var isSame = (var1 === var2);
+    var sameType = (type1 == type2);
+    var isEqual = isSame || sameType;
+    if(!isSame) {
+      switch (type1) {
+      case 'String':
+        if(type2!='String') {isEqual = false; break; }
+        isEqual = (var1 == var2);
+        break;
+      case 'Number':
+        if(type2!='Number') {isEqual = false; break; }
+        isEqual = (var1 == var2);
+        break;
+      case 'Boolean':
+      case 'Date':
+        isEqual = (var1 === var2);
+        break;
+      case 'RegExp':
+      case 'Function':
+        isEqual = (var1.toString() === var2.toString());
+        break;
+      default: //Object | Array
+        var i;
+        if (isEqual = (var1.length === var2.length))
+          for (i in var1)
+            module.assertObjectEquals(
+              msg + ' found nested ' + 
+                type1 + '@' + i + '\n', 
+              var1[i], var2[i]);
+      }
+      _assert(msg, isEqual, 
+              'Expected ' + utils.displayStringForValue(var1) + 
+              ' but was ' + utils.displayStringForValue(var2));
+    }
+  };
+
+  module.assertArrayEquals = module.assertObjectEquals;
+
+  module.assertEvaluatesToTrue = function() {
+    module._validateArguments(1, arguments);
+    var value = module.nonCommentArg(1, 1, arguments);
+    if (!value)
+      utils.fail('',module.commentArg(1, arguments));
+  };
+
+  module.assertEvaluatesToFalse = function() {
+    module._validateArguments(1, arguments);
+    var value = module.nonCommentArg(1, 1, arguments);
+    if (value)
+      utils.fail('',module.commentArg(1, arguments));
+  };
+
+  module.assertHTMLEquals = function() {
+    module._validateArguments(2, arguments);
+    var var1 = module.nonCommentArg(1, 2, arguments);
+    var var2 = module.nonCommentArg(2, 2, arguments);
+    var var1Standardized = module.standardizeHTML(var1);
+    var var2Standardized = module.standardizeHTML(var2);
+
+    _assert( module.commentArg(2, arguments), 
+             var1Standardized === var2Standardized, 
+             'Expected ' + 
+             utils.displayStringForValue(var1Standardized) + 
+             ' but was ' + 
+             utils.displayStringForValue(var2Standardized));
+  };
+
+  module.assertHashEquals = function() {
+    module._validateArguments(2, arguments);
+    var var1 = module.nonCommentArg(1, 2, arguments);
+    var var2 = module.nonCommentArg(2, 2, arguments);
+    for (var key in var1) {
+      module.assertNotUndefined(
+        "Expected hash had key " + key + 
+          " that was not found", var2[key]);
+      module.assertEquals(
+        "Value for key " + key + 
+          " mismatch - expected = " + var1[key] + 
+          ", actual = " + var2[key], var1[key], var2[key]);
+    }
+    for (var key in var2) {
+      module.assertNotUndefined(
+        "Actual hash had key " + key + 
+          " that was not expected", var1[key]);
+    }
+  };
+
+  module.assertRoughlyEquals = function() {
+    module._validateArguments(3, arguments);
+    var expected = module.nonCommentArg(1, 3, arguments);
+    var actual = module.nonCommentArg(2, 3, arguments);
+    var tolerance = module.nonCommentArg(3, 3, arguments);
+    module.assertTrue(
+      "Expected " + expected + 
+        ", but got " + actual + 
+        " which was more than " + tolerance + 
+        " away", Math.abs(expected - actual) < tolerance);
+  };
+
+  module.assertContains = function() {
+    module._validateArguments(2, arguments);
+    var contained = module.nonCommentArg(1, 2, arguments);
+    var container = module.nonCommentArg(2, 2, arguments);
+    module.assertTrue(
+      "Expected '" + container + 
+        "' to contain '" + contained + "'",
+      container.indexOf(contained) != -1);
+  };
+
+  // Test if error object is a failure raised by an assertion.
+
+  module.assertFailure = function(comment, errorObject) {
+    module.assertNotNull(comment, errorObject);
+    module.assert(comment, errorObject.isFailure);
+    module.assertNotUndefined(comment, errorObject.comment);
+  };
+
+  // Test if error object is an error other than a failure
+  // (indicating an error has been thrown which is not related
+  // to an assertion/test).
+
+  module.assertError = function(comment, errorObject) {
+    module.assertNotNull(comment, errorObject);
+    module.assertUndefined(comment, errorObject.isFailure);
+    module.assertNotUndefined(comment, errorObject.description);
+  };
+
+  module.standardizeHTML = function(html) {
+    var translator = document.createElement("DIV");
+    translator.innerHTML = html;
+    return translator.innerHTML;
+  };
+
+  module.argumentsIncludeComments = function(expectedNumberOfNonCommentArgs,args) {
     return args.length == expectedNumberOfNonCommentArgs + 1;
   };
 
-  utils.commentArg = function(expectedNumberOfNonCommentArgs,
+  module.commentArg = function(expectedNumberOfNonCommentArgs,
                        args) {
-    if (utils.argumentsIncludeComments(
+    if (module.argumentsIncludeComments(
       expectedNumberOfNonCommentArgs,args))
       return args[0];
 
     return null;
   };
 
-  utils.nonCommentArg = function(desiredNonCommentArgIndex, 
+  module.nonCommentArg = function(desiredNonCommentArgIndex, 
                           expectedNumberOfNonCommentArgs, 
                           args) {
-    return utils.argumentsIncludeComments(
+    return module.argumentsIncludeComments(
       expectedNumberOfNonCommentArgs, args) ?
       args[desiredNonCommentArgIndex] :
       args[desiredNonCommentArgIndex - 1];
   };
   
-  utils._validateArguments = function(expectedNumberOfNonCommentArgs,
+  module._validateArguments = function(expectedNumberOfNonCommentArgs,
                                args) {
     if (!( args.length == expectedNumberOfNonCommentArgs ||
            (args.length == expectedNumberOfNonCommentArgs + 1 && 
             typeof(args[0]) == 'string') ))
-      utils.error('Incorrect arguments passed to assert function');
+      module.error('Incorrect arguments passed to assert function');
   };
 
-  utils.standardizeHTML = function(html) {
-    var translator = document.createElement("DIV");
-    translator.innerHTML = html;
-    return translator.innerHTML;
-  };
 
   wrapAssertions();
+  return module;
+
+}();
+/*
+   This is a source file for UnitJS a unit testing framework
+   for javascript.
+   Copyright (C) 2014 Daniel Bush
+   This program is distributed under the terms of the GNU
+   General Public License.  A copy of the license should be
+   enclosed with this project in the file LICENSE.  If not
+   see <http://www.gnu.org/licenses/>.
+  
+*/
+
+// An rspec-inspired lib for doing assertions in your tests.
+//
+// Intended to replace assertions.js.
+//
+// Provides:
+//   it(...) => wrapper around some value you want to test
+//   error_for(...) => returns error
+//
+// Example:
+//   it(a).should.be(1);
+//   var e = error_for(fail())
+//   e.should.exist();
+
+$dlb_id_au$.unitJS.shoulds = function() {
+
+  var module   = {};
+  var utils    = $dlb_id_au$.unitJS.assert_utils;
+  var testLifetime = $dlb_id_au$.unitJS.testLifetime;
+
+  // ------------------------------------------------------------
+  // Lower level stuff...
+
+  module.Should = function(thing) {
+    this.thing = thing;
+  };
+
+  module.Should.prototype = {
+
+    // Test if something is the same 'expected'.
+    //
+    // Array comparison is included ie if two arrays
+    // contain the same elements, they are considered identical.
+
+    be:function(expected) {
+      testLifetime.before_assert();
+      if(utils.do_array_compare(this.thing,expected)) {
+        if(!utils.array_compare(this.thing,expected)) {
+          this._fail(expected,this.thing);
+        }
+      }
+      else if(utils.compare(this.thing,expected)) {
+      } else {
+        this._fail(expected,this.thing);
+      }
+      testLifetime.after_assert();
+    },
+
+    not_be:function(expected) {
+      testLifetime.before_assert();
+      if(utils.do_array_compare(this.thing,expected)) {
+        if(utils.array_compare(this.thing,expected)) {
+          this._fail(expected,this.thing);
+        }
+      }
+      else if(!utils.compare(this.thing,expected)) {
+      } else {
+        this._fail(expected,this.thing);
+      }
+      testLifetime.after_assert();
+    },
+
+    // Test if something matches regex.
+
+    match:function(regex) {
+      testLifetime.before_assert();
+      if(!regex.test(this.thing)) {
+        this._fail(regex,this.thing);
+      }
+      testLifetime.after_assert();
+    },
+
+    not_match:function(regex) {
+      testLifetime.before_assert();
+      if(regex.test(this.thing)) {
+        this._fail(regex,this.thing);
+      }
+      testLifetime.after_assert();
+    },
+
+    // Test if something returns non-null or not-undefined.
+
+    exist:function() {
+      var expected = "*not null or undefined*";
+      testLifetime.before_assert();
+      switch(this.thing) {
+      case null: 
+      case undefined: 
+        this._fail(null,this.thing,expected);
+        break;
+      default:
+        break;
+      }
+      testLifetime.after_assert();
+    },
+
+    not_exist:function() {
+      var expected = "*either null or undefined*";
+      testLifetime.before_assert();
+      switch(this.thing) {
+      case null: 
+      case undefined: 
+        break;
+      default:
+        this._fail(null,this.thing,expected);
+        break;
+      }
+      testLifetime.after_assert();
+    },
+
+    _fail:function(expected,actual,expectedmsg) {
+      if(expectedmsg) {
+        expected = expectedmsg
+      } else {
+        expected = utils.to_s(expected);
+      }
+      var errorMsg = 'Expected ' + expected + 
+        ' but was ' + utils.to_s(actual);
+
+      utils.fail(null,errorMsg);
+    }
+
+  };
+
+  // ------------------------------------------------------------
+  // High level stuff
+
+  // Create a should object that we can use over and over again.
+  module.should = new module.Should(null);
+  module.itretval = {should:module.should};
+
+  module.it = function(thing) {
+    //var should = new module.Should(thing):
+    module.itretval.should.thing = thing;
+    return module.itretval;
+  };
+
+  module.error_for = function(fn) {
+    try {
+      fn();
+    } catch(e) {
+      return e;
+    }
+    return null;
+  };
+
+
+
   return module;
 
 }();
@@ -703,12 +954,16 @@ $dlb_id_au$.unitJS.assertions = function() {
 $dlb_id_au$.unitJS.run = function() {
 
   var module = {};
-  var data       = $dlb_id_au$.unitJS.data;
-  var utils      = $dlb_id_au$.unitJS.utils;
-  var doTest     = $dlb_id_au$.unitJS.assertions.doTest;
-  var STATE      = $dlb_id_au$.unitJS.data.testStates;
-  var testLifetime = $dlb_id_au$.unitJS.assertions.testLifetime;
+  var data         = $dlb_id_au$.unitJS.data;
+  var utils        = $dlb_id_au$.unitJS.utils;
+  var doTest       = $dlb_id_au$.unitJS.assertions.doTest;
+  var STATE        = $dlb_id_au$.unitJS.data.testStates;
+  var testLifetime = $dlb_id_au$.unitJS.testLifetime;
   var assertions   = $dlb_id_au$.unitJS.assertions;
+  var shoulds      = $dlb_id_au$.unitJS.shoulds;
+
+  console.log("here");
+  console.log(testLifetime);
 
   // Run a test 'test' and update it.
 
