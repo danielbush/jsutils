@@ -7,10 +7,10 @@ enclosed with this project in the file LICENSE.  If not
 see <http://www.gnu.org/licenses/>.
 */
 
-// Callback object.
+// Callbacks object.
 //
 // You can use it provide a callback (function) to something.
-//   c = new Callback();
+//   c = new Callbacks();
 //   fn = c.get('myCallback');
 //   // ... give fn to something
 // Later (or before, it doesn't matter) you can set the function:
@@ -20,11 +20,11 @@ see <http://www.gnu.org/licenses/>.
 // If the callback is called before 'set', a message will be logged to
 // console.log.
 
-$dlb_id_au$.utils.Callback = function() {
+$dlb_id_au$.utils.Callbacks = function() {
   this.registry = {};
 };
 
-$dlb_id_au$.utils.Callback.prototype = {
+$dlb_id_au$.utils.Callbacks.prototype = {
 
   get$:function(name,fn) {
     var that=this;
