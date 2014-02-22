@@ -7,13 +7,16 @@ enclosed with this project in the file LICENSE.  If not
 see <http://www.gnu.org/licenses/>.
 */
 
-var data = $dlb_id_au$.unitJS.data;
+var data        = $dlb_id_au$.unitJS.data;
+var with_tests$ = $dlb_id_au$.unitJS.with$.with_tests$;
+var with_tests  = $dlb_id_au$.unitJS.with$.with_tests;
+var run         = $dlb_id_au$.unitJS.run.run;
+var print       = $dlb_id_au$.unitJS.print.print;
+var it          = $dlb_id_au$.unitJS.shoulds.it;
+var error_for   = $dlb_id_au$.unitJS.shoulds.error_for;
+
 var tests = data.makeTests(); 
 tests.name = 'All';
-var with_tests$ = $dlb_id_au$.unitJS.with$.with_tests$;
-var with_tests = $dlb_id_au$.unitJS.with$.with_tests;
-var run = $dlb_id_au$.unitJS.run.run;
-var print = $dlb_id_au$.unitJS.print.print;
 
 // Run tests:
 window.onload = function() {
