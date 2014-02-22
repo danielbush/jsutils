@@ -283,6 +283,39 @@ $dlb_id_au$.utils.gen_utils = function() {
     return o;
   };
 
+  // Partition array of values into an array of array of values.
+  //
+  // Examines result of extractfn called on each member in 'arr'.
+  // A new member array is generated with each change in the result.
+  // If extractfn is not given, an identity function which returns
+  // the same value is used.
+  //
+  // Example:
+  // partition([1,1,1,2,2,3]) => [[1,1,1],[2,2],[3]]
+
+  module.partition = function(arr,extractfn) {
+
+    var result = [];
+    if(arr.length==0) return result;
+    if(!extractfn) {
+      extractfn = function(i) {return i;};
+    }
+    
+    var r=null,i=0,t=null,pt=null;
+    while(i<arr.length) {
+      t = extractfn(arr[i]);
+      if((i==0) || (t!=pt)) {
+        r = [];
+        result.push(r);
+      }
+      // POST
+      r.push(arr[i]);
+      i++; pt=t;
+    }
+
+    return result;
+  };
+
   module.when = function(condfn,fn,timeout,interval) {
     var wid,elapsed=0;
     if(!timeout) timeout = 0; // forever
