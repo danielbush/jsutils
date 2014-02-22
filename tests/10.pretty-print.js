@@ -10,9 +10,11 @@ tests.items.push(
       var str;
       var pp = utils.pretty_print.p;
       str = pp({a:1});
-      this.assertEquals('pp of an object','{a:1}',str);
+      // 'pp of an object'
+      it(str).should.be('{a:1}');
       str = pp([1,'a']);
-      this.assertEquals('pp of an array','[1,"a"]',str);
+      //'pp of an array'
+      it(str).should.be('[1,"a"]');
     });
 
   })
