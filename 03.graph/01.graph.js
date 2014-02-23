@@ -18,14 +18,21 @@ $dlb_id_au$.utils.graph = function() {
   // - id's the vertex when it is added to the graph ('add_vertex')
   // - generates extended vertex info associated with the vertex
   //   with the same id
-  // - allows you to specify the id property used for the vertex
-  //   (by default it is 'id')
+  // - allows you to specify the id property name used for the vertex
+  //   (by default it is 'id') (extended vertex info always uses
+  //   'id').
   // - for any 2 vertices v1,v2 we can have
   //   - any number of undirected edges
   //   - any number of directed edges
   //   - data (eg weights) can be stored against the edges
   // - you don't create edges explicitly; they are created
   //   when you call add_edge.
+  // - the 2 main datastructures are this.v$ and this.e$; these
+  //   are hashed by id.
+  // - index_edge and unindex_edge are the 2 main functions that
+  //   try to provide just enough indexing to make navigating
+  //   and exploring the graph useful and efficient.  They
+  //   could be overridden or augmented perhaps.
 
   module.Graph = function(vs,es,options) {
     var i,e;
@@ -39,8 +46,12 @@ $dlb_id_au$.utils.graph = function() {
     this.idlabel = idlabel;
     this.idx = 0;
 
-    // Stores extended vertex and edge information indexed by the vertex itself:
+    // Extended vertex info store here.
+    // Indexed by id.
     this.v$ = {};
+
+    // Edges are stored here:
+    // Indexed by id.
     this.e$ = {};
 
     // Store indexes for this graph.
@@ -67,6 +78,12 @@ $dlb_id_au$.utils.graph = function() {
 
   module.Graph.prototype = {
 
+    // Return all vertices.
+
+    vertices:function() {
+      return this.v$;
+    },
+
     // Add vertex v (an object) to this graph.
     //
     // The vertex will not be connected to anything.
@@ -87,17 +104,15 @@ $dlb_id_au$.utils.graph = function() {
       return this.v$[vid];
     },
 
-    // Return all vertices.
-
-    vertices:function() {
-      return this.v$;
+    remove_vertex:function(vid) {
+      var v;
+      v = this.get_vertex(vid);
+      if(!v) return;
+      delete(this.v$[vid]);
+      // TODO: get rid of edges?
     },
 
-    remove_vertex:function() {
-    },
-
-    remove_edge:function() {
-    },
+    // ------------------------------------------------------------
 
     // Return all edges.
 
@@ -118,23 +133,51 @@ $dlb_id_au$.utils.graph = function() {
       var id = this.idlabel;
       e[id] = ++this.idx;
       this.e$[e[id]] = e;
-      this.index_edge.apply(this,arguments);
+      this.index_edge(e);
       return e;
     },
 
+    get_edge:function(eid) {
+      return this.e$[eid];
+    },
+
+    remove_edge:function(eid) {
+      var e;
+      e = this.get_edge(eid);
+      if(!e) return;
+      delete(this.e$[eid]);
+      this.unindex_edge(e);
+    },
+
+    // ------------------------------------------------------------
+    // Indexing...
+
     // Add relationship to indexes.
 
-    index_edge:function(v1,v2,directed,o) {
+    index_edge:function(e) {
       var id = this.idlabel;
-      var v1$ = this.v$[v1[id]];
-      var v2$ = this.v$[v2[id]];
-      if(directed) {
-        v1$.outgoing[v2$[id]] = v2$;
-        v2$.incoming[v1$[id]] = v1$;
+      var v1$ = this.v$[e.v1[id]];
+      var v2$ = this.v$[e.v2[id]];
+      if(e.directed) {
+        v1$.outgoing[v2$[id]] = v1$.outgoing[v2$[id]] || [];
+        v2$.incoming[v1$[id]] = v2$.incoming[v1$[id]] || [];
+
+        v1$.outgoing[v2$[id]].push(e);
+        v2$.incoming[v1$[id]].push(e);
       } else {
-        v1$.undirected[v2$[id]] = v2$;
-        v2$.undirected[v1$[id]] = v1$;
+        v1$.undirected[v2$[id]] = v1$.undirected[v2$[id]] || [];
+        v2$.undirected[v1$[id]] = v2$.undirected[v1$[id]] || [];
+
+        v1$.undirected[v2$[id]].push(e);
+        v2$.undirected[v1$[id]].push(e);
       }
+    },
+
+    // Removes edge from index.
+    //
+    // Should more or less undo 'index_edge'.
+
+    unindex_edge:function(e) {
     }
 
   };

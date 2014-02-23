@@ -51,6 +51,10 @@ tests.items.push(with_tests$('03.graph',function(M){
       });
     });
 
+    M.tests("when removing vertices",function(M){
+      M.test("it should remove and return any edges associated with it")
+    });
+
     M.tests("when adding edges",function(M){
       M.test("it should return edge info",function(){
         var g,v,e;
@@ -75,8 +79,8 @@ tests.items.push(with_tests$('03.graph',function(M){
         e = g.add_edge(vs[0],vs[1],true,{foo:123});
         v1$ = g.get_vertex(vs[0].id);
         v2$ = g.get_vertex(vs[1].id);
-        it(v1$.outgoing[v2$.id]).should.be(v2$);
-        it(v2$.incoming[v1$.id]).should.be(v1$);
+        it(v1$.outgoing[v2$.id][0]).should.be(e);
+        it(v2$.incoming[v1$.id][0]).should.be(e);
         it(v1$.undirected[v2$.id]).should.not_exist();
         it(v2$.undirected[v1$.id]).should.not_exist();
         
@@ -85,11 +89,15 @@ tests.items.push(with_tests$('03.graph',function(M){
         e = g.add_edge(vs[0],vs[1],false,{foo:123});
         v1$ = g.get_vertex(vs[0].id);
         v2$ = g.get_vertex(vs[1].id);
-        it(v1$.undirected[v2$.id]).should.be(v2$);
-        it(v2$.undirected[v1$.id]).should.be(v1$);
+        it(v1$.undirected[v2$.id][0]).should.be(e);
+        it(v2$.undirected[v1$.id][0]).should.be(e);
         it(v1$.outgoing[v2$.id]).should.not_exist();
         it(v2$.incoming[v1$.id]).should.not_exist();
       });
+    });
+
+    M.tests("when removing edges",function(M){
+      M.test("it should update the vertex indices")
     });
 
     M.tests("in general",function(M){
@@ -99,7 +107,9 @@ tests.items.push(with_tests$('03.graph',function(M){
         g = new G.Graph(vs);
         e = g.add_edge(vs[0],vs[1],false,{foo:123});
         v0$ = g.get_vertex(vs[0].id); // get extended info
-        it(v0$.undirected[vs[1].id]).should.be(g.get_vertex(vs[1].id));
+        // So have to walk the array and find an edge we want...
+        it(v0$.undirected[vs[1].id]).should.exist(e);
+        it(v0$.undirected[vs[1].id][0]).should.be(e);
       });
     });
 
