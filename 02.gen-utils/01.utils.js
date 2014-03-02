@@ -272,48 +272,22 @@ $dlb_id_au$.utils.gen_utils = function() {
   // `process`: is called only for non-blank gaps
   // `o`      : is an optional object you can pass in which will be
   //            passed on to `unsplit` and `process`
+  //
+  // DEPRECATED
+  // Use interleave.
 
   module.join = function(arr,unsplit,process,o) {
     var i,l=arr.length;
     for(i=0;i<l;i++) {
-      if(arr[i]!=='') process(arr[i],o);
+      if(arr[i]!=='') {
+        process(arr[i],o);
+      }
       //process(arr[i],o);
-      if(i!=l-1) unsplit(o);
+      if(i!=l-1) {
+        unsplit(o);
+      }
     }
     return o;
-  };
-
-  // Partition array of values into an array of array of values.
-  //
-  // Examines result of extractfn called on each member in 'arr'.
-  // A new member array is generated with each change in the result.
-  // If extractfn is not given, an identity function which returns
-  // the same value is used.
-  //
-  // Example:
-  // partition([1,1,1,2,2,3]) => [[1,1,1],[2,2],[3]]
-
-  module.partition = function(arr,extractfn) {
-
-    var result = [];
-    if(arr.length==0) return result;
-    if(!extractfn) {
-      extractfn = function(i) {return i;};
-    }
-    
-    var r=null,i=0,t=null,pt=null;
-    while(i<arr.length) {
-      t = extractfn(arr[i]);
-      if((i==0) || (t!=pt)) {
-        r = [];
-        result.push(r);
-      }
-      // POST
-      r.push(arr[i]);
-      i++; pt=t;
-    }
-
-    return result;
   };
 
   module.when = function(condfn,fn,timeout,interval) {
@@ -333,6 +307,55 @@ $dlb_id_au$.utils.gen_utils = function() {
       }
     },interval);
     return wid;
+  };
+
+  // Take array and interleave members in pairs.
+  // 
+  // If arr is [1,2,3] then
+  // interleave([1,2,3],true) => [[1,2],[2,3]]
+  // interleave([1,2,3],fn,true) => [fn(1,2),fn(2,3)]
+  // interleave([1,2,3],fn) => nil, side effect: fn(1,2),fn(2,3)
+  //
+  // MOTIVATION
+  // For example, joining items in a linked list or join text
+  // with a delimiter.  (See tests.)
+  // Both examples don't rely on interleave to return or
+  // transform its input.
+  // So, if you want that, you need to set map=true.
+  //
+  // If you do
+  //   interleave.call(someObject,...)
+  // then
+  //   fn will be called: fn.call(this,...)
+  // 
+  // This can allow you to accumulate results.
+  // eg To join an array into a comma-delimited string.
+
+  module.interleave = function(arr,fn,map) {
+    var i,r,arr2;
+    if(!fn) {
+      fn = function() {
+        return [arguments[0],arguments[1]];
+      };
+    }
+    if(map) {
+      arr2=[];
+    }
+
+    for(i=0;i<arr.length;i++) {
+      if(i==(arr.length-1)) {
+        break;
+      }
+      r = fn.call(this,arr[i],arr[i+1]);
+      if(map) {
+        arr2.push(r);
+      }
+    }
+    if(!map) {
+      return;
+    } else {
+      return arr2;
+    }
   };
 
   return module;
