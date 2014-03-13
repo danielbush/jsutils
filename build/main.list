@@ -5,4 +5,10 @@
 03.list-tree/02.data2.js
 03.list-tree/05.find-ops.js
 03.list-tree/07.edit-ops.js
+03.list-tree2/00.conf.js
+03.list-tree2/02.data.js
+03.list-tree2/05.list.js
+03.list-tree2/06.tree.js
+03.list-tree2/07.edit.js
+03.graph/01.graph.js
 10.pretty-print/01.pretty-print.js
