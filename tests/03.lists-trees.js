@@ -8,7 +8,7 @@ tests.items.push(with_tests$('lists and trees',function(M){
   var findops   = $dlb_id_au$.utils.listtree.findops;
   var editops   = $dlb_id_au$.utils.listtree.editops;
 
-  M.tests('data2 list/tree ops',function(M){
+  M.tests('data2 list/tree ops (DEPRECATED)',function(M){
 
     M.test('Make entry...',function(){
       var e = data2.makeEntry();
