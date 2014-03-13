@@ -18,7 +18,7 @@ tests.items.push(with_tests$('01.utils',function(M){
       ['val2a','val2b',{field2c:'val2c',field2d:[1,2,3]}]
     ];
     var a = [],b = [];
-    var result = utils.gen_utils.eachr(o,null,function(thing,index,before){
+    var result = utils.gen_utils.eachr(o,function(thing,index,before){
       if(before) {
         a.push([index,thing]);
       } else {
@@ -42,16 +42,16 @@ tests.items.push(with_tests$('01.utils',function(M){
   });
 
   M.tests("mapr",function(M){
-    M.test("it should clone (not be exact copy",function(){
+    M.test("it should return a clone of the original",function(){
       var o = {a:1,b:[1,2,3],c:[4,5,6]};
-      var result = utils.gen_utils.mapr(o,null,function(){});
+      var result = utils.gen_utils.mapr(o,function(){});
       it(result.a).should.be(1);
       it(result).should.not_be(o);
     });
 
     M.test("it should transform the original",function(){
       var o = {a:1,b:[1,2,3],c:[4,5,6]};
-      var result = utils.gen_utils.mapr(o,null,function(thing){
+      var result = utils.gen_utils.mapr(o,function(thing){
         thing.a = 24;
       });
       it(result.a).should.be(24);

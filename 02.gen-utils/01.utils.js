@@ -131,7 +131,7 @@ $dlb_id_au$.utils.gen_utils = function() {
   // on but don't want to alter it, consider using
   // mapr.
 
-  module.eachr = function(thing,index,fn,nested,p) {
+  module.eachr = function(thing,fn,index,nested,p) {
     var r;
     // The outer call should not set `nested`.
     // We set it to zero.
@@ -140,7 +140,7 @@ $dlb_id_au$.utils.gen_utils = function() {
       r = fn(thing,index,true,nested,p);
       if(!r) {
         for(var i=0;i<thing.length;i++) {
-          module.eachr(thing[i],i,fn,nested+1,thing);
+          module.eachr(thing[i],fn,i,nested+1,thing);
         }
       }
       r = fn(thing,index,false,nested,p);
@@ -150,7 +150,7 @@ $dlb_id_au$.utils.gen_utils = function() {
       if(!r) {
         for(var n in thing) {
           if(thing.hasOwnProperty(n)) {
-            module.eachr(thing[n],n,fn,nested+1,thing);
+            module.eachr(thing[n],fn,n,nested+1,thing);
           }
         }
       }
@@ -177,7 +177,7 @@ $dlb_id_au$.utils.gen_utils = function() {
     // The intention is that `thing` is a nested combination
     // of object and array literals (or something of that nature).
 
-    module.mapr = function(thing,index,fn,nested,p) {
+    module.mapr = function(thing,fn,index,nested,p) {
       var r,o;
       if(!nested) nested=0;
 
@@ -193,7 +193,7 @@ $dlb_id_au$.utils.gen_utils = function() {
         r = fn(o,index,true,nested,p);
         if(!r) {
           for(var i=0;i<thing.length;i++) {
-            module.mapr(thing[i],i,fn,nested+1,o);
+            module.mapr(thing[i],fn,i,nested+1,o);
           }
         }
         r = fn(o,index,false,nested,p);
@@ -204,7 +204,7 @@ $dlb_id_au$.utils.gen_utils = function() {
         if(!r) {
           for(var n in thing) {
             if(thing.hasOwnProperty(n)) {
-              module.mapr(thing[n],n,fn,nested+1,o);
+              module.mapr(thing[n],fn,n,nested+1,o);
             }
           }
         }
