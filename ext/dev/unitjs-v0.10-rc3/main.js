@@ -1,7 +1,7 @@
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
-   Copyright (C) 2009-2013 Daniel Bush
+   Copyright (C) 2009-2014 Daniel Bush
    This program is distributed under the terms of the GNU
    General Public License.  A copy of the license should be
    enclosed with this project in the file LICENSE.  If not
@@ -20,7 +20,7 @@ $dlb_id_au$.unitJS = $dlb_id_au$.unitJS || {};
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
-   Copyright (C) 2009-2013 Daniel Bush
+   Copyright (C) 2009-2014 Daniel Bush
    This program is distributed under the terms of the GNU
    General Public License.  A copy of the license should be
    enclosed with this project in the file LICENSE.  If not
@@ -144,7 +144,7 @@ $dlb_id_au$.unitJS.data = function() {
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
-   Copyright (C) 2009-2013 Daniel Bush
+   Copyright (C) 2009-2014 Daniel Bush
    This program is distributed under the terms of the GNU
    General Public License.  A copy of the license should be
    enclosed with this project in the file LICENSE.  If not
@@ -258,7 +258,6 @@ $dlb_id_au$.unitJS.testLifetime = function() {
     module.assertion_level = 0;
   };
 
-  console.log("loaded testLifetime");
   return module;
 
 }();
@@ -322,7 +321,8 @@ $dlb_id_au$.unitJS.assert_utils = function() {
   };
 
   /**
-   * A more functional typeof
+   * A more functional typeof.
+   *
    * @param Object o
    * @return String
    */
@@ -374,6 +374,10 @@ $dlb_id_au$.unitJS.assert_utils = function() {
     }
   };
 
+  /**
+   * Return a string representation of something.
+   */
+
   module.to_s = function(aVar) {
     var result = '<' + aVar + '>';
     if (!(aVar === null || aVar === undefined)) {
@@ -382,6 +386,7 @@ $dlb_id_au$.unitJS.assert_utils = function() {
     return result;
   };
 
+  // Deprecated.
   module.displayStringForValue = module.to_s;
 
   /*
@@ -403,6 +408,10 @@ $dlb_id_au$.unitJS.assert_utils = function() {
     throw e;
   };
 
+  /**
+   * Raise a general error.
+   */
+
   module.error = function(errorMessage) {
     var e = new Error(errorMessage);
     e.description = errorMessage;  // FIXME: Do we need this???
@@ -416,7 +425,7 @@ $dlb_id_au$.unitJS.assert_utils = function() {
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
-   Copyright (C) 2009-2013 Daniel Bush
+   Copyright (C) 2009-2014 Daniel Bush
    This program is distributed under the terms of the GNU
    General Public License.  A copy of the license should be
    enclosed with this project in the file LICENSE.  If not
@@ -431,6 +440,7 @@ $dlb_id_au$.unitJS.assert_utils = function() {
 // This module defines the available assertions that can be made in
 // your tests.
 //
+// DEPRECATED
 // This is being replaced by the 'shoulds' module.
 
 $dlb_id_au$.unitJS.assertions = function() {
@@ -797,6 +807,7 @@ $dlb_id_au$.unitJS.assertions = function() {
 //   it(a).should.be(1);
 //   var e = error_for(fail())
 //   e.should.exist();
+//   it(e.message).should.match(/blah/i);
 
 $dlb_id_au$.unitJS.shoulds = function() {
 
@@ -867,7 +878,7 @@ $dlb_id_au$.unitJS.shoulds = function() {
     // Test if something returns non-null or not-undefined.
 
     exist:function() {
-      var expected = "*not null or undefined*";
+      var expected = "*not null or not undefined*";
       testLifetime.before_assert();
       switch(this.thing) {
       case null: 
@@ -922,6 +933,9 @@ $dlb_id_au$.unitJS.shoulds = function() {
   };
 
   module.error_for = function(fn) {
+    if(typeof fn != "function") {
+      utils.fail(null,"error_for expects a function");
+    }
     try {
       fn();
     } catch(e) {
@@ -938,7 +952,7 @@ $dlb_id_au$.unitJS.shoulds = function() {
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
-   Copyright (C) 2009-2013 Daniel Bush
+   Copyright (C) 2009-2014 Daniel Bush
    This program is distributed under the terms of the GNU
    General Public License.  A copy of the license should be
    enclosed with this project in the file LICENSE.  If not
@@ -950,7 +964,8 @@ $dlb_id_au$.unitJS.shoulds = function() {
 
 */
 
-// This module contains code for running tests and assembling stats.
+// This module contains code for running tests and
+// assembling/calculating stats.
 
 $dlb_id_au$.unitJS.run = function() {
 
@@ -962,9 +977,6 @@ $dlb_id_au$.unitJS.run = function() {
   var testLifetime = $dlb_id_au$.unitJS.testLifetime;
   var assertions   = $dlb_id_au$.unitJS.assertions;
   var shoulds      = $dlb_id_au$.unitJS.shoulds;
-
-  console.log("here");
-  console.log(testLifetime);
 
   // Run a test 'test' and update it.
 
@@ -1105,7 +1117,7 @@ $dlb_id_au$.unitJS.run = function() {
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
-   Copyright (C) 2009-2013 Daniel Bush
+   Copyright (C) 2009-2014 Daniel Bush
    This program is distributed under the terms of the GNU
    General Public License.  A copy of the license should be
    enclosed with this project in the file LICENSE.  If not
@@ -1117,8 +1129,11 @@ $dlb_id_au$.unitJS.run = function() {
 
 */
 
-// This module defines with_tests and with_tests$ functions that
-// provide a convenient way to write tests.
+// This module defines with_tests and with_tests$ functions.
+//
+// These functions allow you to define the order and structure of your
+// tests.  You can arbitrarily nest "tests" sections, and each "tests"
+// section can have 0 or more actual "test" elements.
 
 $dlb_id_au$.unitJS.with$ = function() {
 
@@ -1132,6 +1147,7 @@ $dlb_id_au$.unitJS.with$ = function() {
   // The tests are not executed.
 
   module.with_tests$ = function(name,fn,parentTests) {
+    var msg;
     var tests = null;
     var o = {
       setup:function(fn) {
@@ -1164,7 +1180,35 @@ $dlb_id_au$.unitJS.with$ = function() {
       }
     }
 
-    fn(o);
+    // Catch any funky stuff being done within a "tests" section.
+    //
+    // Sometimes people can accidentally put assertions here or
+    // they do some global stuff that throws an error.
+
+    try {
+      if(typeof fn == "function") {
+        fn(o);
+      } else {
+        // Do nothing.
+      }
+    } catch(e) {
+      if(e.isFailure) {
+        msg = "You tried to run an assertion in a 'tests' section called: '"+
+          name+"'; it must be in a 'test' function.";
+        console.log(msg);
+        if(typeof alert != "undefined") {
+          alert(msg);
+        }
+      } else {
+        msg = "There was an error in your 'tests' section called: '"+
+          name+"'; message: "+
+          e.message + "; " + e.stack;
+        console.log(msg);
+        if(typeof alert != "undefined") {
+          alert(msg);
+        }
+      }
+    }
     return tests;
   };
 
@@ -1182,7 +1226,7 @@ $dlb_id_au$.unitJS.with$ = function() {
 /*
    This is a source file for UnitJS a unit testing framework
    for javascript.
-   Copyright (C) 2009-2013 Daniel Bush
+   Copyright (C) 2009-2014 Daniel Bush
    This program is distributed under the terms of the GNU
    General Public License.  A copy of the license should be
    enclosed with this project in the file LICENSE.  If not
@@ -1196,6 +1240,7 @@ $dlb_id_au$.unitJS.with$ = function() {
 
 // This module deals with iterating through a 'tests' structure and
 // converting it into html (the DOM).
+// 
 // You could of course take the same iterations here and generate
 // completely different output eg for terminal.
 
@@ -1342,6 +1387,7 @@ $dlb_id_au$.unitJS.print = function() {
     name = d2 = node('div',['name']);
     d2.innerHTML = tests.name;
     d2.appendChild(printStats(tests.cumulative));
+    d2.appendChild(node('div',['clear']));
     d.appendChild(d2);
 
     d3 = node('div',['test-group']);
@@ -1395,6 +1441,7 @@ $dlb_id_au$.unitJS.print = function() {
     d3 = node('div',['status',test.status]);
     d3.innerHTML = test.status;
     d2.appendChild(d3);
+    d2.appendChild(node('div',['clear']));
 
     details = d2 = node('div',['details']);
     d.appendChild(d2);
