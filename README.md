@@ -27,9 +27,6 @@ This is a bunch of utilities that are not tied to the browser or the DOM which i
   * a stack: a weird thing that I haven't found a use for
   * and callbacks, a simple idea which allows you to call a
     callback even if it hasn't been defined yet
-* TODO possibly looking at adding:
-  * a trie
-  * a trie
 
 list-tree2
 ----------
