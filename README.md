@@ -12,7 +12,7 @@ This is a bunch of utilities that are not tied to the browser or the DOM which i
     this function is useful for joining lists and even strings
 * a pretty printer
 * a double linked list implementation (03.list-tree2)
-* a tree implemenation (also 03.list-tree2)
+* a tree implementation (also 03.list-tree2)
   * the tree implementation defines edit operations much like the DOM
     and includes an override mechanism to use DOM attach operations
     if you are working with DOM-trees
@@ -38,7 +38,7 @@ You can alter these.
 If you want your labels to be: 'next','previous','first', you can do this.
 You you will need to generate a new version of the module.
 
-See the label parametrisation examples in tests/03.list-tree2.js .
+See the label parameterisation examples in tests/03.list-tree2.js .
 
 Deprecated
 ----------
